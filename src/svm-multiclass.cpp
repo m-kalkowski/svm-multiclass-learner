@@ -13,7 +13,9 @@
 
 #include <dlib/svm_threaded.h>
 
+#include <fstream>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -23,12 +25,12 @@ using namespace std;
 using namespace dlib;
 
 // Our data will be 2-dimensional data. So declare an appropriate type to contain these points.
-typedef matrix<double,2,1> sample_type;
+typedef matrix<double, 2, 1> sample_type;
 
 // ----------------------------------------------------------------------------------------
-void parseSessionData(std::vector<sample_type>& trainSamples,
+void parseSessionData(std::vector<std::vector<double> >& trainSamples,
                       std::vector<double>& trainLabels,
-                      std::vector<sample_type>& testSamples,
+                      std::vector<std::vector<double> >& testSamples,
                       std::vector<double>& testLabels);
 
 // ----------------------------------------------------------------------------------------
@@ -38,11 +40,11 @@ int main()
     try
     {
         // training set of data
-        std::vector<sample_type> trainSamples;
+        std::vector<std::vector<double> > trainSamples;
         std::vector<double> trainLabels;
 
         // testing set of data
-        std::vector<sample_type> testSamples;
+        std::vector<std::vector<double> > testSamples;
         std::vector<double> testLabels;
 
         parseSessionData(trainSamples,
@@ -62,7 +64,7 @@ int main()
         //
         // In this example program we will work with a one_vs_one_trainer object which stores any
         // kind of trainer that uses our sample_type samples.
-        typedef one_vs_one_trainer<any_trainer<sample_type> > ovo_trainer;
+        /*typedef one_vs_one_trainer<any_trainer<sample_type> > ovo_trainer;
 
 
         // Finally, make the one_vs_one_trainer.
@@ -90,7 +92,7 @@ int main()
         randomize_samples(trainSamples, trainLabels);
         cout << "cross validation: \n" << cross_validate_multiclass_trainer(trainer, trainSamples, trainLabels, 5) << endl;
         // The output is shown below.  It is the confusion matrix which describes the results.  Each row
-        // corresponds to a class of data and each column to a prediction.  Reading from top to bottom,
+        // chorresponds to a class of data and each column to a prediction.  Reading from top to bottom,
         // the rows correspond to the class labels if the labels have been listed in sorted order.  So the
         // top row corresponds to class 1, the middle row to class 2, and the bottom row to class 3.  The
         // columns are organized similarly, with the left most column showing how many samples were predicted
@@ -99,6 +101,7 @@ int main()
         // So in the results below we can see that, for the class 1 samples, 60 of them were correctly predicted
         // to be members of class 1 and 0 were incorrectly classified.  Similarly, the other two classes of data
         // are perfectly classified.
+        */
         /*
             cross validation:
             60  0  0
@@ -108,10 +111,10 @@ int main()
 
         // Next, if you wanted to obtain the decision rule learned by a one_vs_one_trainer you
         // would store it into a one_vs_one_decision_function.
-        one_vs_one_decision_function<ovo_trainer> df = trainer.train(trainSamples, trainLabels);
+        //one_vs_one_decision_function<ovo_trainer> df = trainer.train(trainSamples, trainLabels);
 
-        cout << "predicted label: "<< df(trainSamples[0])  << ", true label: "<< trainLabels[0] << endl;
-        cout << "predicted label: "<< df(trainSamples[90]) << ", true label: "<< trainLabels[90] << endl;
+        //cout << "predicted label: "<< df(trainSamples[0])  << ", true label: "<< trainLabels[0] << endl;
+        //cout << "predicted label: "<< df(trainSamples[90]) << ", true label: "<< trainLabels[90] << endl;
         // The output is:
         /*
             predicted label: 2, true label: 2
@@ -125,11 +128,53 @@ int main()
     }
 }
 
-void parseSessionData(std::vector<sample_type>& trainSamples,
+void parseSessionData(std::vector<std::vector<double> >& trainSamples,
                       std::vector<double>& trainLabels,
-                      std::vector<sample_type>& testSamples,
+                      std::vector<std::vector<double> >& testSamples,
                       std::vector<double>& testLabels) {
 
+    std::ifstream features("./data/features-all-channels.txt", std::fstream::in);
 
+    if (!features.is_open())
+        return;
+
+    std::string line;
+    int lineCount = 0;
+
+    while (getline(features, line)) {
+
+        istringstream lineStream(line);
+        std::string value, colon;
+        lineStream >>  value >> colon;
+        if (lineCount <= 1000)
+            trainLabels.push_back(std::stod(value));
+        else
+            testLabels.push_back(std::stod(value));
+
+        std::vector<double> frameFeatures;
+        while (getline(lineStream, value, ',')) {
+             frameFeatures.push_back(std::stod(value));
+        }
+        if (lineCount <= 1000)
+            trainSamples.push_back(frameFeatures);
+        else
+            testSamples.push_back(frameFeatures);
+
+        lineCount++;
+    }
+
+    for (const auto &l : trainLabels) {
+        std::cout << l << ", ";
+    }
+    std::cout << std::endl;
+
+    for (const auto &t : trainSamples) {
+        for (const auto &f : t) {
+            std::cout << f << ", ";
+        }
+        std::cout << std::endl;
+    }
+
+    features.close();
 }
 
