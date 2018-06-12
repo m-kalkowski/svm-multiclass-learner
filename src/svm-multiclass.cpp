@@ -55,100 +55,78 @@ int main()
         // Convert samples to match dlib standards:
         sample_type st_trainSamples;
         st_trainSamples.set_size(trainSamples.at(0).size(), 1);
-
         std::cout << st_trainSamples.size() << std::endl;
+        std::cout << trainLabels.size() << std::endl;
+
+        sample_type st_testSamples;
+        st_testSamples.set_size(testSamples.at(0).size(), 1);
 
         std::vector<sample_type> samples;
         std::vector<double> labels;
 
-        for (auto j=0; j<trainSamples.size(); ++j) {
-            for (auto i=0; i<trainSamples.at(j).size(); ++i) {
-                st_trainSamples(i) = trainSamples.at(j).at(i);
+        std::vector<sample_type> test_samples;
+        std::vector<double> test_labels;
+
+        for (auto i=0; i<trainSamples.size(); ++i) {
+            for (auto j=0; j<trainSamples.at(i).size(); ++j) {
+                st_trainSamples(j) = trainSamples.at(i).at(j);
             }
             samples.push_back(st_trainSamples);
         }
 
+        for (auto j=0; j<testSamples.size(); ++j) {
+            for (auto i=0; i<testSamples.at(j).size(); ++i) {
+                st_testSamples(i) = testSamples.at(j).at(i);
+            }
+            test_samples.push_back(st_testSamples);
+        }
+
         std::string prevLabel = trainLabels.at(0);
         double a = 0;
+        labels.push_back(a);
         for (auto j=1; j<trainLabels.size(); ++j) {
-            labels.push_back(a);
             std::string currentLabel = trainLabels.at(j);
+            if (currentLabel != prevLabel) {
+                a++;
+                prevLabel = currentLabel;
+            }
+            labels.push_back(a);
+        }
+
+        prevLabel = testLabels.at(0);
+        a = 0;
+        for (auto j=0; j<testLabels.size(); ++j) {
+            test_labels.push_back(a);
+            std::string currentLabel = testLabels.at(j);
             if (currentLabel != prevLabel) {
                 a++;
                 prevLabel = currentLabel;
             }
         }
 
+        std::cout << labels.size() << std::endl;
+        std::cout << samples.size() << std::endl;
 
-        for (auto j=0; j<labels.size(); ++j) {
-            std::cout << labels.at(j) << ", ";
-        }
-        std::cout << std::endl << labels.size() << std::endl;
-
-
-        // TODO: Update those comments
-        //
-        // The main object in this example program is the one_vs_one_trainer.  It is essentially
-        // a container class for regular binary classifier trainer objects.  In particular, it
-        // uses the any_trainer object to store any kind of trainer object that implements a
-        // .train(samples,labels) function which returns some kind of learned decision function.
-        // It uses these binary classifiers to construct a voting multiclass classifier.  If
-        // there are N classes then it trains N*(N-1)/2 binary classifiers, one for each pair of
-        // labels, which then vote on the label of a sample.
-        //
-        // In this example program we will work with a one_vs_one_trainer object which stores any
-        // kind of trainer that uses our sample_type samples.
-        typedef one_vs_one_trainer<any_trainer<sample_type> > ovo_trainer;
+        //for (const auto &l : labels)
+        //    std::cout << l << std::endl;
 
 
-        // Finally, make the one_vs_one_trainer.
-        ovo_trainer trainer;
+        typedef linear_kernel<sample_type> kernel_type;
 
-        // Next, we will make two different binary classification trainer objects.  One
-        // which uses kernel ridge regression and RBF kernels and another which uses a
-        // support vector machine and polynomial kernels.  The particular details don't matter.
-        // The point of this part of the example is that you can use any kind of trainer object
-        // with the one_vs_one_trainer.
-        typedef polynomial_kernel<sample_type> poly_kernel;
-
-        // make the binary trainers and set some parameters
-        svm_nu_trainer<poly_kernel> poly_trainer;
-        poly_trainer.set_kernel(poly_kernel(0.1, 1, 2));
+        svm_multiclass_linear_trainer<kernel_type, double> trainer;
+        trainer.set_c(100);
+        trainer.set_epsilon(0.000001);
 
 
-        // Now tell the one_vs_one_trainer that, by default, it should use the rbf_trainer
-        // to solve the individual binary classification subproblems.
-        trainer.set_trainer(poly_trainer);
+        multiclass_linear_decision_function<kernel_type, double> df = trainer.train(samples, labels);
 
-        // As an aside, always shuffle the order of the samples before doing cross validation.
-        // For a discussion of why this is a good idea see the svm_ex.cpp example.
-        randomize_samples(samples, labels);
-        //cout << "cross validation: \n" << cross_validate_multiclass_trainer(trainer, samples, labels, 1) << endl;
-        // The output is shown below.  It is the confusion matrix which describes the results.  Each row
-        // chorresponds to a class of data and each column to a prediction.  Reading from top to bottom,
-        // the rows correspond to the class labels if the labels have been listed in sorted order.  So the
-        // top row corresponds to class 1, the middle row to class 2, and the bottom row to class 3.  The
-        // columns are organized similarly, with the left most column showing how many samples were predicted
-        // as members of class 1.
-        //
-        // So in the results below we can see that, for the class 1 samples, 60 of them were correctly predicted
-        // to be members of class 1 and 0 were incorrectly classified.  Similarly, the other two classes of data
-        // are perfectly classified.
-        /*
-            cross validation:
-            60  0  0
-            0 70  0
-            0  0 80
-        */
 
-        // Next, if you wanted to obtain the decision rule learned by a one_vs_one_trainer you
-        // would store it into a one_vs_one_decision_function.
-        one_vs_one_decision_function<ovo_trainer> df = trainer.train(samples, labels);
+        for (auto i=0; i<labels.size(); ++i)
+            cout << "predicted label: "<< df(samples[i])  << ", true label: "<< labels[i] << endl;
 
-        cout << "predicted label: "<< df(samples[0])  << ", true label: "<< labels[0] << endl;
-        cout << "predicted label: "<< df(samples[500]) << ", true label: "<< labels[500] << endl;
+        serialize("df.dat") << df;
 
-        serialize("model_diff.dat") << df;
+
         // The output is:
         /*
             predicted label: 2, true label: 2
@@ -180,16 +158,16 @@ void parseSessionData(std::vector<std::vector<double> >& trainSamples,
         istringstream lineStream(line);
         std::string value, colon;
         lineStream >>  value >> colon;
-        if (lineCount <= 1000)
+        if (lineCount < 250)
             trainLabels.push_back(value);
         else
             testLabels.push_back(value);
 
         std::vector<double> frameFeatures;
         while (getline(lineStream, value, ',')) {
-             frameFeatures.push_back(std::stod(value));
+            frameFeatures.push_back(std::stod(value));
         }
-        if (lineCount <= 1000)
+        if (lineCount < 250)
             trainSamples.push_back(frameFeatures);
         else
             testSamples.push_back(frameFeatures);
