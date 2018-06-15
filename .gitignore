@@ -34,4 +34,6 @@
 
 dlib*
 build
-data
+moc_*
+ui_*
+qrc_*
