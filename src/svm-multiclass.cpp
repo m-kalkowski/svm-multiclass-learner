@@ -158,7 +158,7 @@ void parseSessionData(std::vector<std::vector<double> >& trainSamples,
         istringstream lineStream(line);
         std::string value, colon;
         lineStream >>  value >> colon;
-        if (lineCount < 250)
+        if (lineCount < 1000)
             trainLabels.push_back(value);
         else
             testLabels.push_back(value);
@@ -167,7 +167,7 @@ void parseSessionData(std::vector<std::vector<double> >& trainSamples,
         while (getline(lineStream, value, ',')) {
             frameFeatures.push_back(std::stod(value));
         }
-        if (lineCount < 250)
+        if (lineCount < 1000)
             trainSamples.push_back(frameFeatures);
         else
             testSamples.push_back(frameFeatures);
