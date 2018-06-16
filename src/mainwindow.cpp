@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "qcustomplot.h"
 #include "ui_mainwindow.h"
 
 #include <iostream>
@@ -56,7 +57,25 @@ void MainWindow::onListWidgetDoubleClicked(QListWidgetItem *item)
 
 void MainWindow::onTableWidgetDoubleClicked(int row)
 {
-    std::cout << "Yeah" << std::endl;
+    QVector<double> y = QVector<double>::fromStdVector(m_featuresParser.getTrainSamples().at(row));
+    QVector<double> x(y.size());
+
+    for (auto i=0; i<x.size(); ++i)
+    {
+        x[i] = i;
+    }
+
+    QCustomPlot *plot = (QCustomPlot *)ui->tabWidget->widget(0);
+    // create graph and assign data to it:
+    plot->addGraph();
+    plot->graph(0)->setData(x, y);
+    // give the axes some labels:
+    plot->xAxis->setLabel("x");
+    plot->yAxis->setLabel("y");
+    // set axes ranges, so we see all data:
+    plot->xAxis->setRange(0, x.back());
+    plot->yAxis->setRange(-3300, 3300);
+    plot->replot();
 }
 
 void MainWindow::populateTable()
