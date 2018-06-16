@@ -20,6 +20,11 @@ MainWindow::MainWindow(QWidget *parent) :
             SIGNAL(itemDoubleClicked(QListWidgetItem *)),
             this,
             SLOT(onListWidgetDoubleClicked(QListWidgetItem *)));
+
+    connect(m_table.verticalHeader(),
+            SIGNAL(sectionClicked(int)),
+            this,
+            SLOT(onTableWidgetDoubleClicked(int)));
 }
 
 MainWindow::~MainWindow()
@@ -48,6 +53,11 @@ void MainWindow::onListWidgetDoubleClicked(QListWidgetItem *item)
 
     populateTable();
 }    
+
+void MainWindow::onTableWidgetDoubleClicked(int row)
+{
+    std::cout << "Yeah" << std::endl;
+}
 
 void MainWindow::populateTable()
 {

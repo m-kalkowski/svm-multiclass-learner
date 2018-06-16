@@ -6,6 +6,7 @@
 #include <QMainWindow>
 #include <QListWidgetItem>
 #include <QTableWidget>
+#include <QTableWidgetItem>
 
 
 namespace Ui {
@@ -28,6 +29,7 @@ public:
 
 private slots:
     void onListWidgetDoubleClicked(QListWidgetItem *item);
+    void onTableWidgetDoubleClicked(int row);
 
 private:
     void populateTable();
