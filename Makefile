@@ -43,6 +43,7 @@ SOURCE += \
 	src/moc_mainwindow.cpp \
 	src/moc_qcustomplot.cpp \
 	src/mainwindow.cpp \
+	src/main.cpp \
 	src/qcustomplot.cpp
 
 HEADERS += \
