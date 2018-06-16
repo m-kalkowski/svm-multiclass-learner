@@ -1,47 +1,75 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <iostream>
+
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-	// add two new graphs and set their look:
-	/*ui->tabWidget->plot->addGraph();
-	ui->tabWidget->plot->graph(0)->setPen(QPen(Qt::blue)); // line color blue for first graph
-	ui->tabWidget->plot->graph(0)->setBrush(QBrush(QColor(0, 0, 255, 20))); // first graph will be filled with translucent blue
-	ui->tabWidget->plot->addGraph();
-	ui->tabWidget->plot->graph(1)->setPen(QPen(Qt::red)); // line color red for second graph
-	// generate some points of data (y0 for first, y1 for second graph):
-	QVector<double> x(251), y0(251), y1(251);
-	for (int i=0; i<251; ++i)
-	{
-	  x[i] = i;
-	  y0[i] = qExp(-i/150.0)*qCos(i/10.0); // exponentially decaying cosine
-	  y1[i] = qExp(-i/150.0);              // exponential envelope
-	}
-	// configure right and top axis to show ticks but no labels:
-	// (see QCPAxisRect::setupFullAxesBox for a quicker method to do this)
-	ui->tabWidget->plot->xAxis2->setVisible(true);
-	ui->tabWidget->plot->xAxis2->setTickLabels(false);
-	ui->tabWidget->plot->yAxis2->setVisible(true);
-	ui->tabWidget->plot->yAxis2->setTickLabels(false);
-	// make left and bottom axes always transfer their ranges to right and top axes:
-	connect(ui->tabWidget->plot->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->tabWidget->plot->xAxis2, SLOT(setRange(QCPRange)));
-	connect(ui->tabWidget->plot->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->tabWidget->plot->yAxis2, SLOT(setRange(QCPRange)));
-	// pass data points to graphs:
-	ui->tabWidget->plot->graph(0)->setData(x, y0);
-	ui->tabWidget->plot->graph(1)->setData(x, y1);
-	// let the ranges scale themselves so graph 0 fits perfectly in the visible area:
-	ui->tabWidget->plot->graph(0)->rescaleAxes();
-	// same thing for graph 1, but only enlarge ranges (in case graph 1 is smaller than graph 0):
-	ui->tabWidget->plot->graph(1)->rescaleAxes(true);
-	// Note: we could have also just called tabWidget->plot->rescaleAxes(); instead
-	// Allow user to drag axis ranges with mouse, zoom with mouse wheel and select graphs by clicking:
-	ui->tabWidget->plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);*/
+
+    ui->features->addItem("features-diff-channel");
+    ui->features->addItem("features-all-channels");
+    ui->features->addItem("features-signal-channels");
+
+    ui->tabWidget->addTab(&m_table, "Frames");
+    
+    connect(ui->features,
+            SIGNAL(itemDoubleClicked(QListWidgetItem *)),
+            this,
+            SLOT(onListWidgetDoubleClicked(QListWidgetItem *)));
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+void MainWindow::onListWidgetDoubleClicked(QListWidgetItem *item) 
+{   
+    m_featuresParser.load("./data/" + item->text().toStdString() + ".txt");
+
+    switch (ui->features->currentRow())
+    {
+        case eDIFF_CHANNEL:
+            m_table.setColumnCount(diffChannelFeatures + 1);
+            break;
+        case eALL_CHANNELS:
+            m_table.setColumnCount(allChannelsFeatures + 1);
+            break;
+        case eSIGNAL_CHANNELS:
+            m_table.setColumnCount(signalChannelsFeatures + 1);
+            break;
+    }
+
+    m_table.setRowCount(1000);
+
+    populateTable();
+}    
+
+void MainWindow::populateTable()
+{
+    sample_type trainSamples = m_featuresParser.getTrainSamples();
+    label_type trainLabels = m_featuresParser.getTrainLabels();
+
+    auto currentRow = 0;
+    auto currentColumn = 1;
+
+    for (auto label : trainLabels)
+        m_table.setItem(currentRow++, 0, new QTableWidgetItem(QString::fromStdString(label)));
+    
+    currentRow = 0;
+
+    for (auto frame : trainSamples)
+    {
+        for (auto sample : frame)
+        {
+            m_table.setItem(currentRow, currentColumn++, new QTableWidgetItem(QString::number(sample)));
+        }
+        currentRow++;
+        currentColumn = 1;
+    }
+}
+
