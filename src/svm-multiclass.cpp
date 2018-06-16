@@ -35,7 +35,7 @@ void parseSessionData(std::vector<std::vector<double> >& trainSamples,
 
 // ----------------------------------------------------------------------------------------
 
-int main()
+/*int main()
 {
     try
     {
@@ -128,10 +128,10 @@ int main()
 
 
         // The output is:
-        /*
-            predicted label: 2, true label: 2
-            predicted label: 1, true label: 1
-        */
+        
+        //    predicted label: 2, true label: 2
+        //    predicted label: 1, true label: 1
+        
     }
     catch (std::exception& e)
     {
@@ -139,7 +139,7 @@ int main()
         cout << e.what() << endl;
     }
 }
-
+*/
 void parseSessionData(std::vector<std::vector<double> >& trainSamples,
                       std::vector<std::string>& trainLabels,
                       std::vector<std::vector<double> >& testSamples,
