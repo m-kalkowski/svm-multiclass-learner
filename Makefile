@@ -39,12 +39,14 @@ LDFLAGS += \
 SOURCE += \
     src/svm-multiclass.cpp \
 	$(DLIB_DIR_NAME)/dlib/all/source.cpp \
+	src/features-parser.cpp \
 	src/moc_mainwindow.cpp \
 	src/moc_qcustomplot.cpp \
 	src/mainwindow.cpp \
 	src/qcustomplot.cpp
 
 HEADERS += \
+	include/features-parser.h \
 	include/mainwindow.h \
 	include/qcustomplot.h
 
