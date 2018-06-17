@@ -15,40 +15,6 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="3" column="2">
-     <widget class="QPushButton" name="pushButton">
-      <property name="text">
-       <string>PushButton</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="0">
-     <widget class="QListWidget" name="features">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="0">
-     <widget class="QPushButton" name="pushButton_3">
-      <property name="text">
-       <string>PushButton</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="QListWidget" name="listWidget_2">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-     </widget>
-    </item>
     <item row="0" column="1" rowspan="2" colspan="2">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
@@ -58,6 +24,108 @@
        <attribute name="title">
         <string>Plot</string>
        </attribute>
+      </widget>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QPushButton" name="plotTestButton">
+      <property name="text">
+       <string>Plot Test Signal</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="2">
+     <widget class="QPushButton" name="generateResultsButton">
+      <property name="text">
+       <string>Generate Results</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QListWidget" name="features">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QGroupBox" name="randomSignal">
+      <property name="title">
+       <string>Test Signal</string>
+      </property>
+      <property name="flat">
+       <bool>true</bool>
+      </property>
+      <property name="checkable">
+       <bool>false</bool>
+      </property>
+      <widget class="QRadioButton" name="rb1">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>20</y>
+         <width>241</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>jeden rezystor 120</string>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="rb2">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>40</y>
+         <width>221</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>rezystancja 60</string>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="rb3">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>60</y>
+         <width>141</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>rezystor 10k</string>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="rb4">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>80</y>
+         <width>251</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>zwarcie CAN L do masy przez 110</string>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="rb5">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>100</y>
+         <width>251</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>oba zwarte przez rezystor 110</string>
+       </property>
       </widget>
      </widget>
     </item>
