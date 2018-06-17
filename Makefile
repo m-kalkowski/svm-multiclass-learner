@@ -4,8 +4,10 @@ DLIB_TAR_NAME=dlib-${DLIB_VERSION}.tar.bz2
 DLIB_DOWNLOAD_LINK=http://dlib.net/files/${DLIB_TAR_NAME}
 
 # Quite awful, but seems to be the only dynamic solutions
-QT_LIB_DIR=$(shell qtdiag | grep LibrariesPath | cut -d ":" -f 2)
-QT_INCLUDE_DIR=$(shell qtdiag | grep HeadersPath | cut -d ":" -f 2)
+QT_LIB_DIR=/usr/lib/x86_64-linux-gnu
+QT_INCLUDE_DIR=/usr/include/x86_64-linux-gnu/qt5
+MLPACK_INCLUDE_DIR=/usr/include/mlpack
+MLPACK_LIB_DIR=/usr/lib/x86_64-linux-gnu
 
 # Directory for output files
 OUTDIR = build
@@ -16,6 +18,7 @@ TARGET = svm-multiclass-learner
 CPPFLAGS += \
 	-I include \
 	-I $(DLIB_DIR_NAME) \
+	-I $(MLPACK_INCLUDE_DIR) \
 	-I $(QT_INCLUDE_DIR) \
 	-I $(QT_INCLUDE_DIR)/QtCore \
 	-I $(QT_INCLUDE_DIR)/QtWidgets \
@@ -29,12 +32,14 @@ CPPFLAGS += \
 	-fPIC
 	
 LDFLAGS +=  \
-	-L $(QT_LIB_DIR)
+	-L $(QT_LIB_DIR) \
+	-L $(MLPACK_LIB_DIR)
 
 LDFLAGS += \
 	-lQt5Widgets -lQt5Gui -lQt5Core -lQt5PrintSupport -lGL \
 	-lpthread \
-	-lX11 
+	-lX11 \
+	-lmlpack
 
 SOURCE += \
     src/svm-multiclass.cpp \
