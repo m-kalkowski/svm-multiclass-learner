@@ -259,7 +259,7 @@ void MainWindow::onGenerateResultsButtonClicked()
     sample_type testSamples = m_featuresParser.getTestSamples();
     label_type testLabels = m_featuresParser.getTestLabels();
 
-    m_svmMulticlass.predict(testSamples, predictedLabels, "./models/svm-df");
+    m_svmMulticlass.predict(testSamples, predictedLabels, "./models/svm-all-df");
 
     for (auto i=0; i<testLabels.size(); ++i)
         std::cout << "true label: " << testLabels.at(i) << ", predicted label: " << predictedLabels.at(i) << std::endl;
