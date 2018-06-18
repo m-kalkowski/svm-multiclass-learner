@@ -9,7 +9,8 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    m_row(0)
 {
     ui->setupUi(this);
 
@@ -20,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
     qRegisterMetaType<QVector<int> >("QVector<int>");
 
     ui->tabWidget->addTab(&m_table, "Frames");
-    
+
     connect(ui->features,
             SIGNAL(itemDoubleClicked(QListWidgetItem *)),
             this,
@@ -36,11 +37,16 @@ MainWindow::MainWindow(QWidget *parent) :
             this,
             SLOT(onPlotTestButtonClicked()));
 
-    connect(this, 
+    connect(this,
             SIGNAL(drawRandomPlot(int)),
             this,
             SLOT(onTableWidgetDoubleClicked(int)));
-    
+
+    connect(ui->generateResultsButton,
+            SIGNAL(clicked()),
+            this,
+            SLOT(onGenerateResultsButtonClicked()));
+
     connect(ui->rb1, SIGNAL(clicked()), this, SLOT(onRb1Clicked()));
     connect(ui->rb2, SIGNAL(clicked()), this, SLOT(onRb2Clicked()));
     connect(ui->rb3, SIGNAL(clicked()), this, SLOT(onRb3Clicked()));
@@ -55,12 +61,12 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::onListWidgetDoubleClicked(QListWidgetItem *item) 
-{  
+void MainWindow::onListWidgetDoubleClicked(QListWidgetItem *item)
+{
     m_fileName = "./data/" + item->text().toStdString() + ".txt";
 
     load();
-}    
+}
 
 void MainWindow::onTableWidgetDoubleClicked(int row)
 {
@@ -74,7 +80,7 @@ void MainWindow::onTableWidgetDoubleClicked(int row)
         x.push_back(step);
         step += 2;
     }
-     
+
     switch (ui->features->currentRow())
     {
         case eDIFF_CHANNEL:
@@ -124,7 +130,7 @@ void MainWindow::onTableWidgetDoubleClicked(int row)
             break;
         }
     }
-   
+
     // give the axes some labels:
     plot->xAxis->setLabel("x");
     plot->yAxis->setLabel("y");
@@ -144,7 +150,7 @@ void MainWindow::populateTable()
 
     for (auto label : allLabels)
         m_table.setItem(currentRow++, 0, new QTableWidgetItem(QString::fromStdString(label)));
- 
+
     currentRow = 0;
 
     for (auto frame : allSamples)
@@ -161,7 +167,7 @@ void MainWindow::populateTable()
 void MainWindow::load()
 {
     m_featuresParser.load(m_fileName);
-    
+
     switch (ui->features->currentRow())
     {
         case eDIFF_CHANNEL:
@@ -210,38 +216,36 @@ void MainWindow::onRb5Clicked()
 void MainWindow::onPlotTestButtonClicked()
 {
     std::vector<range> ranges = m_featuresParser.getRanges();
-    int row = 0;
     switch (m_eLabel)
     {
         case eRB1:
         {
-            row = (ranges.at(eRB1).first + (rand() % (int)(ranges.at(eRB1).last - ranges.at(eRB1).first + 1)));
-            emit drawRandomPlot(row + 1000 - 1);
+            m_row = (ranges.at(eRB1).first + (rand() % (int)(ranges.at(eRB1).last - ranges.at(eRB1).first + 1)));
+            emit drawRandomPlot(m_row + 1000 - 1);
             break;
         }
         case eRB2:
         {
-            row = (ranges.at(eRB2).first + (rand() % (int)(ranges.at(eRB2).last - ranges.at(eRB2).first + 1)));                
-            emit drawRandomPlot(row + 1000 - 1);
+            m_row = (ranges.at(eRB2).first + (rand() % (int)(ranges.at(eRB2).last - ranges.at(eRB2).first + 1)));
+            emit drawRandomPlot(m_row + 1000 - 1);
             break;
         }
         case eRB3:
         {
-            row = (ranges.at(eRB3).first + (rand() % (int)(ranges.at(eRB3).last - ranges.at(eRB3).first + 1)));                
-            emit drawRandomPlot(row + 1000 - 1);
+            m_row = (ranges.at(eRB3).first + (rand() % (int)(ranges.at(eRB3).last - ranges.at(eRB3).first + 1)));
+            emit drawRandomPlot(m_row + 1000 - 1);
             break;
         }
         case eRB4:
         {
-            row = (ranges.at(eRB4).first + (rand() % (int)(ranges.at(eRB4).last - ranges.at(eRB4).first + 1)));
-            std::cout << row << ", " <<  ranges.at(eRB4).first << ", " << ranges.at(eRB4).last << std::endl;
-            emit drawRandomPlot(row + 1000 - 1);
+            m_row = (ranges.at(eRB4).first + (rand() % (int)(ranges.at(eRB4).last - ranges.at(eRB4).first + 1)));
+            emit drawRandomPlot(m_row + 1000 - 1);
             break;
         }
         case eRB5:
         {
-            row = (ranges.at(eRB5).first + (rand() % (int)(ranges.at(eRB5).last - ranges.at(eRB5).first + 1)));
-            emit drawRandomPlot(row + 1000 - 1);
+            m_row = (ranges.at(eRB5).first + (rand() % (int)(ranges.at(eRB5).last - ranges.at(eRB5).first + 1)));
+            emit drawRandomPlot(m_row + 1000 - 1);
             break;
         }
         default:
@@ -249,3 +253,14 @@ void MainWindow::onPlotTestButtonClicked()
     }
 }
 
+void MainWindow::onGenerateResultsButtonClicked()
+{
+    std::vector<double> predictedLabels;
+    sample_type testSamples = m_featuresParser.getTestSamples();
+    label_type testLabels = m_featuresParser.getTestLabels();
+
+    m_svmMulticlass.predict(testSamples, predictedLabels, "./models/svm-df");
+
+    for (auto i=0; i<testLabels.size(); ++i)
+        std::cout << "true label: " << testLabels.at(i) << ", predicted label: " << predictedLabels.at(i) << std::endl;
+}

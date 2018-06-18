@@ -1,5 +1,5 @@
 #ifndef FEATURES_PARSER_H
-#define DEATURES_PARSER_H
+#define FEATURES_PARSER_H
 
 #include <fstream>
 #include <iostream>
@@ -10,7 +10,7 @@
 typedef std::vector<std::vector<double>> sample_type;
 typedef std::vector<std::string> label_type;
 
-struct range 
+struct range
 {
     int first;
     int last;
@@ -31,7 +31,7 @@ public :
     inline label_type  & getTrainLabels()  { return m_trainLabels;  }
     inline sample_type & getTestSamples()  { return m_testSamples;  }
     inline label_type  & getTestLabels()   { return m_testLabels;   }
-    
+
     inline std::vector<range> & getRanges() { return m_ranges; }
 
 private:

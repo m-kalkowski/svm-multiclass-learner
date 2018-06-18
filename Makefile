@@ -54,7 +54,8 @@ SOURCE += \
 HEADERS += \
 	include/features-parser.h \
 	include/mainwindow.h \
-	include/qcustomplot.h
+	include/qcustomplot.h \
+	include/svm-multiclass.h
 
 UI += \
 	forms/mainwindow.ui

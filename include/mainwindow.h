@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include "features-parser.h"
+#include "svm-multiclass.h"
 
 #include <QMainWindow>
 #include <QListWidgetItem>
@@ -35,6 +36,7 @@ private slots:
     void onListWidgetDoubleClicked(QListWidgetItem *item);
     void onTableWidgetDoubleClicked(int row);
     void onPlotTestButtonClicked();
+    void onGenerateResultsButtonClicked();
     void onRb1Clicked();
     void onRb2Clicked();
     void onRb3Clicked();
@@ -50,7 +52,9 @@ private:
     Ui::MainWindow *ui;
     QTableWidget m_table;
     FeaturesParser m_featuresParser;
+    SvmMulticlass m_svmMulticlass;
     std::string m_fileName;
+    int m_row;
 };
 
 #endif // MAINWINDOW_H
