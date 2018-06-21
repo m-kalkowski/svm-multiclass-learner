@@ -9,6 +9,7 @@
 #include <QTableWidget>
 #include <QTableWidgetItem>
 
+class QCPRange;
 
 namespace Ui {
 class MainWindow;
@@ -36,7 +37,9 @@ private slots:
     void onListWidgetDoubleClicked(QListWidgetItem *item);
     void onTableWidgetDoubleClicked(int row);
     void onPlotTestButtonClicked();
+    void onPlotSignalButtonClicked();
     void onGenerateResultsButtonClicked();
+    void onRangeChanged(const QCPRange & newRange);
     void onRb1Clicked();
     void onRb2Clicked();
     void onRb3Clicked();
@@ -55,6 +58,7 @@ private:
     SvmMulticlass m_svmMulticlass;
     std::string m_fileName;
     int m_row;
+    int m_xAxisSize;
 };
 
 #endif // MAINWINDOW_H
