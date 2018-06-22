@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+
 typedef std::vector<std::vector<double>> sample_type;
 typedef std::vector<std::string> label_type;
 
@@ -16,14 +17,16 @@ struct range
     int last;
 };
 
-
 class FeaturesParser
 {
 public :
+    static constexpr auto trainVectorsCount = 1000; 
+    static constexpr auto numOfFeatures = 319;
+
     FeaturesParser();
     virtual ~FeaturesParser();
 
-    void load(std::string fileName);
+    bool load(std::string fileName);
 
     inline sample_type & getAllSamples()   { return m_allSamples;   }
     inline label_type  & getAllLabels()    { return m_allLabels;    }
@@ -34,11 +37,14 @@ public :
 
     inline std::vector<range> & getRanges() { return m_ranges; }
 
+    inline int channels() { return m_numOfChannels; }
+
 private:
     void clear();
     void setTestLabelsRanges();
 
     std::ifstream m_featuresFile;
+    int m_numOfChannels;
     std::vector<range> m_ranges;
 
     sample_type m_allSamples;

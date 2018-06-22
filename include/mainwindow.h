@@ -8,6 +8,7 @@
 #include <QListWidgetItem>
 #include <QTableWidget>
 #include <QTableWidgetItem>
+#include <QFileSystemModel>
 
 class QCPRange;
 
@@ -19,12 +20,8 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-    enum { eDIFF_CHANNEL, eALL_CHANNELS, eSIGNAL_CHANNELS };
+    enum EState { eDIFF_CHANNEL, eALL_CHANNELS, eSIGNAL_CHANNELS };
     enum ELabel { eRB1, eRB2, eRB3, eRB4, eRB5};
-
-    static constexpr auto diffChannelFeatures    = 319;
-    static constexpr auto allChannelsFeatures    = 319 * 3;
-    static constexpr auto signalChannelsFeatures = 319 * 2;
 
 public:
     explicit MainWindow(QWidget *parent = 0);
@@ -34,8 +31,8 @@ signals:
     void drawRandomPlot(int row);
 
 private slots:
-    void onListWidgetDoubleClicked(QListWidgetItem *item);
     void onTableWidgetDoubleClicked(int row);
+    void onFeaturesFileDoubleClicked(const QModelIndex & index);
     void onPlotTestButtonClicked();
     void onPlotSignalButtonClicked();
     void onGenerateResultsButtonClicked();
@@ -48,14 +45,16 @@ private slots:
 
 private:
     void populateTable();
-    void load();
-
+    void plot(QVector<double> &x, std::vector<QVector<double>> &y);
+    
     ELabel m_eLabel;
+    EState m_state;
 
     Ui::MainWindow *ui;
     QTableWidget m_table;
     FeaturesParser m_featuresParser;
     SvmMulticlass m_svmMulticlass;
+    QFileSystemModel m_model;
     std::string m_fileName;
     int m_row;
     int m_xAxisSize;

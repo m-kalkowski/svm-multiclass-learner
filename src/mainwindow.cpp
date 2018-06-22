@@ -7,6 +7,10 @@
 #include <ctime>
 
 
+namespace {
+    constexpr auto timeStepMs = 2;
+}
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
@@ -15,18 +19,18 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->features->addItem("features-diff-channel");
-    ui->features->addItem("features-all-channels");
-    ui->features->addItem("features-signal-channels");
-
+    m_model.setRootPath(QDir::currentPath() + "/data"); 
+    ui->features->setModel(&m_model);
+    ui->features->setRootIndex(m_model.index(QDir::currentPath() + "/data"));
+    
     qRegisterMetaType<QVector<int> >("QVector<int>");
 
     ui->tabWidget->addTab(&m_table, "Frames");
 
     connect(ui->features,
-            SIGNAL(itemDoubleClicked(QListWidgetItem *)),
+            SIGNAL(doubleClicked(const QModelIndex &)),
             this,
-            SLOT(onListWidgetDoubleClicked(QListWidgetItem *)));
+            SLOT(onFeaturesFileDoubleClicked(const QModelIndex &)));
 
     connect(m_table.verticalHeader(),
             SIGNAL(sectionClicked(int)),
@@ -73,74 +77,68 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::onListWidgetDoubleClicked(QListWidgetItem *item)
+void MainWindow::onFeaturesFileDoubleClicked(const QModelIndex & index)
 {
-    m_fileName = "./data/" + item->text().toStdString() + ".txt";
+    m_fileName = m_model.filePath(index).toStdString();
+    std::cout << m_fileName << std::endl;
+    if (!m_featuresParser.load(m_fileName))
+    {
+        std::cout << "Unable to open file!" << std::endl;
+        return;
+    }
 
-    load();
+    int channels = m_featuresParser.channels();
+    m_table.setColumnCount(FeaturesParser::numOfFeatures*channels + 1);
+    
+
+    int rowCount = m_featuresParser.getAllSamples().size();
+    m_table.setRowCount(rowCount);
+
+    populateTable();
+    m_table.update();
 }
 
 void MainWindow::onTableWidgetDoubleClicked(int row)
 {
+    QVector<double> x;
+    double time = 0;
+    for (auto i=0; i<FeaturesParser::numOfFeatures; ++i)
+    {
+        x.push_back(time);
+        time += timeStepMs;
+    }
+    
+    std::vector<QVector<double>> y;
+    QVector<double> frameAllChannels = QVector<double>::fromStdVector(m_featuresParser.getAllSamples().at(row));
+    QVector<double> frameOneChannel;
+    
+    int channels = m_featuresParser.channels();
+    for (auto i=0; i<channels; ++i)
+    {
+        for (auto j=0; j<FeaturesParser::numOfFeatures*channels; j+=channels)
+        {
+            frameOneChannel.push_back(frameAllChannels.at(j + i));
+        }
+        y.push_back(frameOneChannel);
+        frameOneChannel.clear();
+    }
+
+    plot(x, y);
+}    
+
+void MainWindow::plot(QVector<double> &x, std::vector<QVector<double>> &y)
+{
     QCustomPlot *plot = (QCustomPlot *)ui->tabWidget->widget(0);
     plot->clearPlottables();
 
-    QVector<double> x;
-    double step = 0;
-    for (auto i=0; i<diffChannelFeatures; ++i)
-    {
-        x.push_back(step);
-        step += 2;
-    }
+    QColor colors[] = {Qt::blue, Qt::red, Qt::green};
 
-    switch (ui->features->currentRow())
+    int channels = m_featuresParser.channels();
+    for (auto i=0; i<channels; ++i)
     {
-        case eDIFF_CHANNEL:
-        {
-            QVector<double> y = QVector<double>::fromStdVector(m_featuresParser.getAllSamples().at(row));
-            plot->addGraph();
-            plot->graph(0)->setData(x, y);
-            break;
-        }
-        case eALL_CHANNELS:
-        {
-            QVector<double> all = QVector<double>::fromStdVector(m_featuresParser.getAllSamples().at(row));
-            QVector<double> diff, high, low;
-            for (auto i=0; i<all.size(); i+=3)
-            {
-                high.push_back(all.at(i));
-                low.push_back(all.at(i + 1));
-                diff.push_back(all.at(i + 2));
-            }
-
-            plot->addGraph();
-            plot->graph(0)->setPen(QPen(Qt::blue));
-            plot->graph(0)->setData(x, high);
-            plot->addGraph();
-            plot->graph(1)->setPen(QPen(Qt::red));
-            plot->graph(1)->setData(x, low);
-            plot->addGraph();
-            plot->graph(2)->setPen(QPen(Qt::green));
-            plot->graph(2)->setData(x, diff);
-            break;
-        }
-        case eSIGNAL_CHANNELS:
-        {
-            QVector<double> all = QVector<double>::fromStdVector(m_featuresParser.getAllSamples().at(row));
-            QVector<double> high, low;
-            for (auto i=0; i<all.size(); i+=2)
-            {
-                high.push_back(all.at(i));
-                low.push_back(all.at(i + 1));
-            }
-            plot->addGraph();
-            plot->graph(0)->setPen(QPen(Qt::blue));
-            plot->graph(0)->setData(x, high);
-            plot->addGraph();
-            plot->graph(1)->setPen(QPen(Qt::red));
-            plot->graph(1)->setData(x, low);
-            break;
-        }
+        plot->addGraph();
+        plot->graph(i)->setPen(QPen(colors[i]));
+        plot->graph(i)->setData(x, y.at(i));
     }
 
     // give the axes some labels:
@@ -176,30 +174,6 @@ void MainWindow::populateTable()
     }
 }
 
-void MainWindow::load()
-{
-    m_featuresParser.load(m_fileName);
-
-    switch (ui->features->currentRow())
-    {
-        case eDIFF_CHANNEL:
-            m_table.setColumnCount(diffChannelFeatures + 1);
-            break;
-        case eALL_CHANNELS:
-            m_table.setColumnCount(allChannelsFeatures + 1);
-            break;
-        case eSIGNAL_CHANNELS:
-            m_table.setColumnCount(signalChannelsFeatures + 1);
-            break;
-    }
-
-    int rowCount = m_featuresParser.getAllSamples().size();
-    m_table.setRowCount(rowCount);
-
-    populateTable();
-    m_table.update();
-}
-
 void MainWindow::onRb1Clicked()
 {
     m_eLabel = eRB1;
@@ -227,52 +201,52 @@ void MainWindow::onRb5Clicked()
 
 void MainWindow::onPlotTestButtonClicked()
 {
+    int row = 0;
     std::vector<range> ranges = m_featuresParser.getRanges();
     switch (m_eLabel)
     {
         case eRB1:
-        {
-            m_row = (ranges.at(eRB1).first + (rand() % (int)(ranges.at(eRB1).last - ranges.at(eRB1).first + 1)));
-            emit drawRandomPlot(m_row + 1000 - 1);
+            row = (ranges.at(eRB1).first + (rand() % (int)(ranges.at(eRB1).last - ranges.at(eRB1).first + 1)));
             break;
-        }
         case eRB2:
-        {
-            m_row = (ranges.at(eRB2).first + (rand() % (int)(ranges.at(eRB2).last - ranges.at(eRB2).first + 1)));
-            emit drawRandomPlot(m_row + 1000 - 1);
+            row = (ranges.at(eRB2).first + (rand() % (int)(ranges.at(eRB2).last - ranges.at(eRB2).first + 1)));
             break;
-        }
         case eRB3:
-        {
-            m_row = (ranges.at(eRB3).first + (rand() % (int)(ranges.at(eRB3).last - ranges.at(eRB3).first + 1)));
-            emit drawRandomPlot(m_row + 1000 - 1);
+            row = (ranges.at(eRB3).first + (rand() % (int)(ranges.at(eRB3).last - ranges.at(eRB3).first + 1)));
             break;
-        }
         case eRB4:
-        {
-            m_row = (ranges.at(eRB4).first + (rand() % (int)(ranges.at(eRB4).last - ranges.at(eRB4).first + 1)));
-            emit drawRandomPlot(m_row + 1000 - 1);
+            row = (ranges.at(eRB4).first + (rand() % (int)(ranges.at(eRB4).last - ranges.at(eRB4).first + 1)));
             break;
-        }
         case eRB5:
-        {
-            m_row = (ranges.at(eRB5).first + (rand() % (int)(ranges.at(eRB5).last - ranges.at(eRB5).first + 1)));
-            emit drawRandomPlot(m_row + 1000 - 1);
+            row = (ranges.at(eRB5).first + (rand() % (int)(ranges.at(eRB5).last - ranges.at(eRB5).first + 1)));
             break;
-        }
         default:
         break;
     }
+    
+    QVector<double> x;
+    double time = 0;
+    for (auto i=0; i<FeaturesParser::numOfFeatures; ++i)
+    {
+        x.push_back(time);
+        time += timeStepMs;
+    }
+    
+    std::vector<QVector<double>> y;
+    y.push_back(QVector<double>::fromStdVector(m_featuresParser.getTestSamples().at(row)));
+
+    plot(x, y);
 }
 
 void MainWindow::onRangeChanged(const QCPRange &newRange)
 {
     ui->plot->xAxis->setRange(newRange.bounded(0, m_xAxisSize));
 }
+
 void MainWindow::onPlotSignalButtonClicked()
 {
 
-    sample_type signal;   
+   /* sample_type signal;   
     label_type label;
     label_type testLabels = m_featuresParser.getTestLabels();
     sample_type testSamples =  m_featuresParser.getTestSamples();
@@ -284,7 +258,7 @@ void MainWindow::onPlotSignalButtonClicked()
         int randomFrameNumber = 1 + (rand() % testLabels.size() - 1);
         signal.push_back(testSamples.at(randomFrameNumber));
         label.push_back(testLabels.at(randomFrameNumber));
-    }
+    }*/
 
     /*std::vector<double> predictedLabels;
     
@@ -294,13 +268,13 @@ void MainWindow::onPlotSignalButtonClicked()
         std::cout << "true label: " << label.at(i) << ", predicted label: " << predictedLabels.at(i) << std::endl;
     */
 
-    QCustomPlot *plot = (QCustomPlot *)ui->tabWidget->widget(0);
+   /* QCustomPlot *plot = (QCustomPlot *)ui->tabWidget->widget(0);
     plot->clearPlottables();
     plot->clearItems();
     
     QVector<double> x;
     double step = 0;
-    for (auto i=0; i<diffChannelFeatures * label.size(); ++i)
+    for (size_t i=0; i<FeaturesParser::numOfFeatures * label.size(); ++i)
     {
         x.push_back(step);
         step += 2;
@@ -404,7 +378,7 @@ void MainWindow::onPlotSignalButtonClicked()
     plot->xAxis->setRange(0, x.back());
     plot->yAxis->setRange(-3300, 3300);
     plot->replot();
-
+*/
 }
 
 void MainWindow::onGenerateResultsButtonClicked()

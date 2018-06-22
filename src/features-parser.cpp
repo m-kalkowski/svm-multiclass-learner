@@ -1,7 +1,8 @@
 #include "features-parser.h"
 
 
-FeaturesParser::FeaturesParser()
+FeaturesParser::FeaturesParser():
+    m_numOfChannels(0)
 {
 }
 
@@ -9,17 +10,14 @@ FeaturesParser::~FeaturesParser()
 {
 }
 
-void FeaturesParser::load(std::string fileName)
+bool FeaturesParser::load(std::string fileName)
 {
     clear();
 
     m_featuresFile.open(fileName);
  
     if (!m_featuresFile.is_open())
-    {
-        std::cout << "Unable to open file" << std::endl;
-        return;
-    }
+        return false;
 
     std::string line;
 
@@ -38,14 +36,16 @@ void FeaturesParser::load(std::string fileName)
         m_allSamples.push_back(frameFeatures);
     }
 
+    m_numOfChannels = m_allSamples.back().size() / numOfFeatures;
+
     sample_type::const_iterator firstSample = m_allSamples.begin();
-    sample_type::const_iterator midSample  = m_allSamples.begin() + 1000;
+    sample_type::const_iterator midSample  = m_allSamples.begin() + trainVectorsCount;
     sample_type::const_iterator lastSample = m_allSamples.end();
     m_trainSamples.assign(firstSample, midSample);
     m_testSamples.assign(midSample, lastSample);
 
     label_type::const_iterator firstLabel = m_allLabels.begin();
-    label_type::const_iterator midLabel  = m_allLabels.begin() + 1000;
+    label_type::const_iterator midLabel  = m_allLabels.begin() + trainVectorsCount;
     label_type::const_iterator lastLabel = m_allLabels.end();
     m_trainLabels.assign(firstLabel, midLabel);
     m_testLabels.assign(midLabel, lastLabel);
@@ -53,6 +53,8 @@ void FeaturesParser::load(std::string fileName)
     setTestLabelsRanges();
 
     m_featuresFile.close();
+
+    return true;
 }
 
 void FeaturesParser::clear()

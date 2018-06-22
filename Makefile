@@ -23,7 +23,8 @@ CPPFLAGS += \
 	-I $(QT_INCLUDE_DIR)/QtCore \
 	-I $(QT_INCLUDE_DIR)/QtWidgets \
 	-I $(QT_INCLUDE_DIR)/QtGui \
-	-I $(QT_INCLUDE_DIR)/QtPrintSupport
+	-I $(QT_INCLUDE_DIR)/QtPrintSupport \
+	-I $(QT_INCLUDE_DIR)/QtFileSystemModel
 
 CPPFLAGS += \
 	-O0 \
