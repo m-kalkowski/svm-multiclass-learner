@@ -24,7 +24,10 @@ CPPFLAGS += \
 	-I $(QT_INCLUDE_DIR)/QtWidgets \
 	-I $(QT_INCLUDE_DIR)/QtGui \
 	-I $(QT_INCLUDE_DIR)/QtPrintSupport \
-	-I $(QT_INCLUDE_DIR)/QtFileSystemModel
+	-I $(QT_INCLUDE_DIR)/QtFileSystemModel \
+	-I $(QT_INCLUDE_DIR)/QtSplitter \
+	-I $(QT_INCLUDE_DIR)/QtTextStream \
+	-I $(QT_INCLUDE_DIR)/QtFont
 
 CPPFLAGS += \
 	-O0 \
@@ -44,23 +47,32 @@ LDFLAGS += \
 
 SOURCE += \
     src/svm-multiclass.cpp \
+    src/dnn-multiclass.cpp \
 	$(DLIB_DIR_NAME)/dlib/all/source.cpp \
 	src/features-parser.cpp \
 	src/moc_mainwindow.cpp \
 	src/moc_qcustomplot.cpp \
 	src/mainwindow.cpp \
 	src/main.cpp \
-	src/qcustomplot.cpp
+	src/qcustomplot.cpp \
+	src/qrc_style.cpp
 
 HEADERS += \
 	include/features-parser.h \
 	include/mainwindow.h \
 	include/qcustomplot.h \
-	include/svm-multiclass.h
+	include/svm-multiclass.h \
+	include/dnn-multiclass.h
 
 UI += \
 	forms/mainwindow.ui
-	
+
+QRC += \
+	layout/qdarkstyle/style.qrc
+
+QRC_GENERATED_FILES += \
+	src/qrc_style.cpp
+
 UI_GENERATED_FILES += \
 	include/ui_mainwindow.h
 
@@ -79,12 +91,13 @@ all: createdirs dlib build
 bin: $(OUTDIR)/$(TARGET).bin
 ui: $(UI_GENERATED_FILES)
 moc: $(MOC_GENERATED_FILES)
+qrc: $(QRC_GENERATED_FILES)
 
 include/ui_%.h: forms/%.ui
 	QT_SELECT=qt5 uic $< -o $@
 
-qrc_%.cpp: %.qrc
-	QT_SELECT=qt5 qrc $< $< -o $@
+src/qrc_%.cpp: layout/qdarkstyle/%.qrc
+	QT_SELECT=qt5 rcc $< -o $@
 
 src/moc_%.cpp: include/%.h
 	QT_SELECT=qt5 moc $< -o $@
@@ -99,7 +112,7 @@ dlib:
 .SILENT: dlib
 
 
-build: ui moc bin
+build: qrc ui moc bin
 
 .SECONDARY : $(TARGET).bin
 .PRECIOUS : $(ALLOBJ)
