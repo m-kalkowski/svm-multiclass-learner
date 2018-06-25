@@ -3,12 +3,14 @@
 
 #include "features-parser.h"
 #include "svm-multiclass.h"
+#include "dnn-multiclass.h"
 
 #include <QMainWindow>
 #include <QListWidgetItem>
 #include <QTableWidget>
 #include <QTableWidgetItem>
 #include <QFileSystemModel>
+#include <QSplitter>
 
 class QCPRange;
 
@@ -45,7 +47,7 @@ private slots:
 
 private:
     void populateTable();
-    void plot(QVector<double> &x, std::vector<QVector<double>> &y);
+    void plot(QVector<double> &x, QVector<double> &y);
     
     ELabel m_eLabel;
     EState m_state;
@@ -54,7 +56,10 @@ private:
     QTableWidget m_table;
     FeaturesParser m_featuresParser;
     SvmMulticlass m_svmMulticlass;
-    QFileSystemModel m_model;
+    DnnMulticlass m_dnnMulticlass;
+    QFileSystemModel m_featuresModel;
+    QFileSystemModel m_modelsModel;
+    QSplitter m_splitter;
     std::string m_fileName;
     int m_row;
     int m_xAxisSize;

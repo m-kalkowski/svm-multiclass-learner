@@ -2,6 +2,7 @@
 #include "qcustomplot.h"
 #include "ui_mainwindow.h"
 
+#include <QFont>
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
@@ -19,9 +20,13 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    m_model.setRootPath(QDir::currentPath() + "/data"); 
-    ui->features->setModel(&m_model);
-    ui->features->setRootIndex(m_model.index(QDir::currentPath() + "/data"));
+    m_featuresModel.setRootPath(QDir::currentPath() + "/data"); 
+    ui->features->setModel(&m_featuresModel);
+    ui->features->setRootIndex(m_featuresModel.index(QDir::currentPath() + "/data"));
+ 
+    m_modelsModel.setRootPath(QDir::currentPath() + "/models"); 
+    ui->models->setModel(&m_modelsModel);
+    ui->models->setRootIndex(m_modelsModel.index(QDir::currentPath() + "/models"));
     
     qRegisterMetaType<QVector<int> >("QVector<int>");
 
@@ -58,6 +63,22 @@ MainWindow::MainWindow(QWidget *parent) :
             SLOT(onGenerateResultsButtonClicked()));
 
     QCustomPlot *plot = (QCustomPlot *)ui->tabWidget->widget(0);
+    plot->setBackground(QColor(35, 38, 41));
+    plot->xAxis->setTickLabelColor(QColor(255, 255, 255));
+    plot->xAxis->setBasePen(QColor(255, 255, 255));
+    plot->xAxis->setTickPen(QColor(255, 255, 255));
+    plot->xAxis->setSubTickPen(QColor(255, 255, 255));
+    plot->xAxis->setTickLabelFont(QFont("Helvetica [Cronyx]", 7));
+    plot->yAxis->setTickLabelColor(QColor(255, 255, 255));
+    plot->yAxis->setBasePen(QColor(255, 255, 255));
+    plot->yAxis->setTickPen(QColor(255, 255, 255));
+    plot->yAxis->setSubTickPen(QColor(255, 255, 255));
+    plot->yAxis->setTickLabelFont(QFont("Helvetica [Cronyx]", 7));
+    plot->xAxis->setLabelColor(QColor(255, 255, 255));	
+    plot->xAxis->setLabelFont(QFont("Helvetica [Cronyx]", 7));	
+    plot->yAxis->setLabelColor(QColor(255, 255, 255));	
+    plot->yAxis->setLabelFont(QFont("Helvetica [Cronyx]", 7));	
+    
     connect(plot->xAxis,
             SIGNAL(rangeChanged(const QCPRange &)),
             this,
@@ -79,7 +100,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::onFeaturesFileDoubleClicked(const QModelIndex & index)
 {
-    m_fileName = m_model.filePath(index).toStdString();
+    m_fileName = m_featuresModel.filePath(index).toStdString();
     std::cout << m_fileName << std::endl;
     if (!m_featuresParser.load(m_fileName))
     {
@@ -108,8 +129,19 @@ void MainWindow::onTableWidgetDoubleClicked(int row)
         time += timeStepMs;
     }
     
-    std::vector<QVector<double>> y;
-    QVector<double> frameAllChannels = QVector<double>::fromStdVector(m_featuresParser.getAllSamples().at(row));
+    QVector<double> y = QVector<double>::fromStdVector(m_featuresParser.getAllSamples().at(row));
+
+    plot(x, y);
+}    
+
+void MainWindow::plot(QVector<double> &x, QVector<double> &y)
+{
+    QCustomPlot *plot = (QCustomPlot *)ui->tabWidget->widget(0);
+    plot->clearPlottables();
+
+
+    QColor colors[] = {Qt::blue, Qt::red, Qt::green};
+
     QVector<double> frameOneChannel;
     
     int channels = m_featuresParser.channels();
@@ -117,33 +149,18 @@ void MainWindow::onTableWidgetDoubleClicked(int row)
     {
         for (auto j=0; j<FeaturesParser::numOfFeatures*channels; j+=channels)
         {
-            frameOneChannel.push_back(frameAllChannels.at(j + i));
+            frameOneChannel.push_back(y.at(j + i));
         }
-        y.push_back(frameOneChannel);
+        plot->addGraph();
+        plot->graph(i)->setPen(QPen(colors[i]));
+        plot->graph(i)->setData(x, frameOneChannel);
+       
         frameOneChannel.clear();
     }
 
-    plot(x, y);
-}    
-
-void MainWindow::plot(QVector<double> &x, std::vector<QVector<double>> &y)
-{
-    QCustomPlot *plot = (QCustomPlot *)ui->tabWidget->widget(0);
-    plot->clearPlottables();
-
-    QColor colors[] = {Qt::blue, Qt::red, Qt::green};
-
-    int channels = m_featuresParser.channels();
-    for (auto i=0; i<channels; ++i)
-    {
-        plot->addGraph();
-        plot->graph(i)->setPen(QPen(colors[i]));
-        plot->graph(i)->setData(x, y.at(i));
-    }
-
     // give the axes some labels:
-    plot->xAxis->setLabel("x");
-    plot->yAxis->setLabel("y");
+    plot->xAxis->setLabel("t[ms]");
+    plot->yAxis->setLabel("V[mV]");
     // set axes ranges, so we see all data:
     plot->xAxis->setRange(0, x.back());
     plot->yAxis->setRange(-3300, 3300);
@@ -232,8 +249,7 @@ void MainWindow::onPlotTestButtonClicked()
         time += timeStepMs;
     }
     
-    std::vector<QVector<double>> y;
-    y.push_back(QVector<double>::fromStdVector(m_featuresParser.getTestSamples().at(row)));
+    QVector<double> y = QVector<double>::fromStdVector(m_featuresParser.getTestSamples().at(row));
 
     plot(x, y);
 }
@@ -387,8 +403,13 @@ void MainWindow::onGenerateResultsButtonClicked()
     sample_type testSamples = m_featuresParser.getTestSamples();
     label_type testLabels = m_featuresParser.getTestLabels();
 
-    m_svmMulticlass.predict(testSamples, predictedLabels, "./models/svm-all-df");
+    m_dnnMulticlass.predict(testSamples, predictedLabels, "./models/dnn-all-df");
 
-    for (auto i=0; i<testLabels.size(); ++i)
-        std::cout << "true label: " << testLabels.at(i) << ", predicted label: " << predictedLabels.at(i) << std::endl;
+    //for (auto i=0; i<testLabels.size(); ++i)
+    //    std::cout << "true label: " << testLabels.at(i) << ", predicted label: " << predictedLabels.at(i) << std::endl;
+    
+    //sample_type trainSamples = m_featuresParser.getTrainSamples();
+    //label_type trainLabels = m_featuresParser.getTrainLabels();
+    //m_dnnMulticlass.train(trainSamples, trainLabels, "./models/dnn-all-df");
+
 }
