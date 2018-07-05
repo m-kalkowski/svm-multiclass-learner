@@ -59,6 +59,7 @@ SOURCE += \
 
 HEADERS += \
 	include/features-parser.h \
+	include/i-machine-learner.h \ 
 	include/mainwindow.h \
 	include/qcustomplot.h \
 	include/svm-multiclass.h \
