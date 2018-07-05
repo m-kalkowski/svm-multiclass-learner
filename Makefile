@@ -49,6 +49,8 @@ SOURCE += \
     src/svm-multiclass.cpp \
 	src/svmc-ova-learner.cpp \
 	src/svmc-ovo-learner.cpp \
+	src/svmnu-ova-learner.cpp \
+	src/svmnu-ovo-learner.cpp \
     src/dnn-multiclass.cpp \
 	$(DLIB_DIR_NAME)/dlib/all/source.cpp \
 	src/features-parser.cpp \
@@ -67,6 +69,8 @@ HEADERS += \
 	include/svm-multiclass.h \
 	include/svmc-ova-learner.h \
 	include/svmc-ovo-learner.h \
+	include/svmnu-ova-learner.h \
+	include/svmnu-ovo-learner.h \
 	include/dnn-multiclass.h
 
 UI += \
