@@ -1,6 +1,12 @@
 #ifndef I_MACHINE_LEARNER
 #define I_MACHINE_LEARNER
 
+#include <string>
+#include <vector>
+
+typedef std::vector<std::vector<double>> sample_type;
+typedef std::vector<std::string> label_type;
+
 
 class IMachineLearner {
 
