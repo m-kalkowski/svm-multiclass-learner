@@ -102,8 +102,7 @@ void MainWindow::onFeaturesFileDoubleClicked(const QModelIndex & index)
 {
     m_fileName = m_featuresModel.filePath(index).toStdString();
     std::cout << m_fileName << std::endl;
-    if (!m_featuresParser.load(m_fileName))
-    {
+    if (!m_featuresParser.load(m_fileName)) {
         std::cout << "Unable to open file!" << std::endl;
         return;
     }
@@ -123,8 +122,7 @@ void MainWindow::onTableWidgetDoubleClicked(int row)
 {
     QVector<double> x;
     double time = 0;
-    for (auto i=0; i<FeaturesParser::numOfFeatures; ++i)
-    {
+    for (auto i=0; i<FeaturesParser::numOfFeatures; ++i) {
         x.push_back(time);
         time += timeStepMs;
     }
@@ -139,18 +137,15 @@ void MainWindow::plot(QVector<double> &x, QVector<double> &y)
     QCustomPlot *plot = (QCustomPlot *)ui->tabWidget->widget(0);
     plot->clearPlottables();
 
-
     QColor colors[] = {Qt::blue, Qt::red, Qt::green};
 
     QVector<double> frameOneChannel;
 
     int channels = m_featuresParser.channels();
-    for (auto i=0; i<channels; ++i)
-    {
+    for (auto i=0; i<channels; ++i) {
         for (auto j=0; j<FeaturesParser::numOfFeatures*channels; j+=channels)
-        {
             frameOneChannel.push_back(y.at(j + i));
-        }
+
         plot->addGraph();
         plot->graph(i)->setPen(QPen(colors[i]));
         plot->graph(i)->setData(x, frameOneChannel);
@@ -180,12 +175,10 @@ void MainWindow::populateTable()
 
     currentRow = 0;
 
-    for (auto frame : allSamples)
-    {
+    for (auto frame : allSamples) {
         for (auto sample : frame)
-        {
             m_table.setItem(currentRow, currentColumn++, new QTableWidgetItem(QString::number(sample)));
-        }
+
         currentRow++;
         currentColumn = 1;
     }
@@ -220,8 +213,7 @@ void MainWindow::onPlotTestButtonClicked()
 {
     int row = 0;
     std::vector<range> ranges = m_featuresParser.getRanges();
-    switch (m_eLabel)
-    {
+    switch (m_eLabel) {
         case eRB1:
             row = (ranges.at(eRB1).first + (rand() % (int)(ranges.at(eRB1).last - ranges.at(eRB1).first + 1)));
             break;
@@ -243,8 +235,7 @@ void MainWindow::onPlotTestButtonClicked()
 
     QVector<double> x;
     double time = 0;
-    for (auto i=0; i<FeaturesParser::numOfFeatures; ++i)
-    {
+    for (auto i=0; i<FeaturesParser::numOfFeatures; ++i) {
         x.push_back(time);
         time += timeStepMs;
     }
@@ -405,11 +396,6 @@ void MainWindow::onGenerateResultsButtonClicked()
 
     m_dnnMulticlass.predict(testSamples, predictedLabels, "./models/dnn-all-df");
 
-    //for (auto i=0; i<testLabels.size(); ++i)
-    //    std::cout << "true label: " << testLabels.at(i) << ", predicted label: " << predictedLabels.at(i) << std::endl;
-
-    //sample_type trainSamples = m_featuresParser.getTrainSamples();
-    //label_type trainLabels = m_featuresParser.getTrainLabels();
-    //m_dnnMulticlass.train(trainSamples, trainLabels, "./models/dnn-all-df");
-
+    for (size_t i=0; i<testLabels.size(); ++i)
+        std::cout << "true label: " << testLabels.at(i) << ", predicted label: " << predictedLabels.at(i) << std::endl;
 }
