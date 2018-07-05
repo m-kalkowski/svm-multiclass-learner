@@ -47,6 +47,7 @@ LDFLAGS += \
 
 SOURCE += \
     src/svm-multiclass.cpp \
+	src/svmc-ovo-learner.cpp \
     src/dnn-multiclass.cpp \
 	$(DLIB_DIR_NAME)/dlib/all/source.cpp \
 	src/features-parser.cpp \
@@ -63,6 +64,7 @@ HEADERS += \
 	include/mainwindow.h \
 	include/qcustomplot.h \
 	include/svm-multiclass.h \
+	include/svmc-ovo-learner.h \
 	include/dnn-multiclass.h
 
 UI += \
