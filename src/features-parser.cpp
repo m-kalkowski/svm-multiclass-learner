@@ -15,7 +15,7 @@ bool FeaturesParser::load(std::string fileName)
     clear();
 
     m_featuresFile.open(fileName);
- 
+
     if (!m_featuresFile.is_open())
         return false;
 
@@ -26,13 +26,13 @@ bool FeaturesParser::load(std::string fileName)
         std::istringstream lineStream(line);
         std::string value, colon;
         lineStream >>  value >> colon;
-         
+
         m_allLabels.push_back(value);
 
         std::vector<double> frameFeatures;
         while (getline(lineStream, value, ','))
             frameFeatures.push_back(std::stod(value));
-        
+
         m_allSamples.push_back(frameFeatures);
     }
 
@@ -60,7 +60,7 @@ bool FeaturesParser::load(std::string fileName)
 void FeaturesParser::clear()
 {
     m_allSamples.clear();
-    m_allLabels.clear(); 
+    m_allLabels.clear();
     m_trainSamples.clear();
     m_trainLabels.clear();
     m_testSamples.clear();
@@ -69,9 +69,9 @@ void FeaturesParser::clear()
 
 void FeaturesParser::setTestLabelsRanges()
 {
-    int first = 0;
+    size_t first = 0;
 
-    for (auto i=1; i<m_testLabels.size(); ++i)
+    for (size_t i=1; i<m_testLabels.size(); ++i)
     {
         if ( m_testLabels.at(i-1) != m_testLabels.at(i))
         {

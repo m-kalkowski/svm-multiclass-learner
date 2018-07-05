@@ -13,14 +13,14 @@ typedef std::vector<std::string> label_type;
 
 struct range
 {
-    int first;
-    int last;
+    size_t first;
+    size_t last;
 };
 
 class FeaturesParser
 {
 public :
-    static constexpr auto trainVectorsCount = 1000; 
+    static constexpr auto trainVectorsCount = 1000;
     static constexpr auto numOfFeatures = 319;
 
     FeaturesParser();

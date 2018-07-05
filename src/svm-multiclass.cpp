@@ -32,9 +32,9 @@ void SvmMulticlass::train(sample_type &trainSamples, label_type &trainLabels, st
     std::vector<matrix<double, 0, 0>> samples;
     std::vector<double> labels;
 
-    for (auto i=0; i<trainSamples.size(); ++i)
+    for (size_t i=0; i<trainSamples.size(); ++i)
     {
-        for (auto j=0; j<trainSamples.at(i).size(); ++j)
+        for (size_t j=0; j<trainSamples.at(i).size(); ++j)
         {
             st_trainSamples(j) = trainSamples.at(i).at(j);
         }
@@ -44,7 +44,7 @@ void SvmMulticlass::train(sample_type &trainSamples, label_type &trainLabels, st
     std::string prevLabel = trainLabels.at(0);
     double a = 0;
     labels.push_back(a);
-    for (auto j=1; j<trainLabels.size(); ++j)
+    for (size_t j=1; j<trainLabels.size(); ++j)
     {
         std::string currentLabel = trainLabels.at(j);
         if (currentLabel != prevLabel)
@@ -83,9 +83,9 @@ void SvmMulticlass::predict(sample_type &testSamples, std::vector<double> &predi
 
     std::vector<matrix<double, 0, 0>> samples;
 
-    for (auto i=0; i<testSamples.size(); ++i)
+    for (size_t i=0; i<testSamples.size(); ++i)
     {
-        for (auto j=0; j<testSamples.at(i).size(); ++j)
+        for (size_t j=0; j<testSamples.at(i).size(); ++j)
         {
             st_testSamples(j) = testSamples.at(i).at(j);
         }

@@ -31,9 +31,9 @@ void DnnMulticlass::train(sample_type &trainSamples, label_type &trainLabels, st
     std::vector<matrix<double>> samples;
     std::vector<matrix<float>> labels;
 
-    for (auto i=0; i<trainSamples.size(); ++i)
+    for (size_t i=0; i<trainSamples.size(); ++i)
     {
-        for (auto j=0; j<trainSamples.at(i).size(); ++j)
+        for (size_t j=0; j<trainSamples.at(i).size(); ++j)
         {
             st_trainSamples(j) = trainSamples.at(i).at(j);
         }
@@ -43,14 +43,14 @@ void DnnMulticlass::train(sample_type &trainSamples, label_type &trainLabels, st
     std::string prevLabel = trainLabels.at(0);
     float a = 0;
     matrix<float> m(5, 1);
-    for (auto i=0; i<5; ++i)
+    for (size_t i=0; i<5; ++i)
         if (i == a)
             m(i) = 1;
         else
             m(i) = 0;
 
     labels.push_back(m);
-    for (auto j=1; j<trainLabels.size(); ++j)
+    for (size_t j=1; j<trainLabels.size(); ++j)
     {
         std::string currentLabel = trainLabels.at(j);
         if (currentLabel != prevLabel)
@@ -58,7 +58,7 @@ void DnnMulticlass::train(sample_type &trainSamples, label_type &trainLabels, st
             a++;
             prevLabel = currentLabel;
         }
-        for (auto i=0; i<5; ++i)
+        for (size_t i=0; i<5; ++i)
         if (i == a)
             m(i) = 1;
         else
@@ -67,12 +67,12 @@ void DnnMulticlass::train(sample_type &trainSamples, label_type &trainLabels, st
         labels.push_back(m);
     }
 
-    for (int i=0; i<samples.size(); ++i)
-        for (int j=0; j<samples.at(i).size(); ++j)
+    for (size_t i=0; i<samples.size(); ++i)
+        for (size_t j=0; j<samples.at(i).size(); ++j)
             samples.at(i)(j) = (samples.at(i)(j) + 3300) / (6600);
 
     using net_type = loss_mean_squared_multioutput<fc<5, input<matrix<double>>>>;
-    
+
     net_type net;
     layer<1>(net).layer_details().set_bias_learning_rate_multiplier(900);
     sgd defsolver(0,0.9);
@@ -86,7 +86,7 @@ void DnnMulticlass::train(sample_type &trainSamples, label_type &trainLabels, st
     // learning rate until the loss stops decreasing.  Then it reduces the learning rate by
     // a factor of 10 and continues running until the loss stops decreasing again.  It will
     // keep doing this until the learning rate has dropped below the min learning rate
-    // defined above or the maximum number of epochs as been executed (defaulted to 10000). 
+    // defined above or the maximum number of epochs as been executed (defaulted to 10000).
     trainer.train(samples, labels);
 
     // At this point our net object should have learned how to classify MNIST images.  But
@@ -105,7 +105,7 @@ void DnnMulticlass::predict(sample_type &testSamples, std::vector<double> &predi
 {
     using net_type = loss_mean_squared_multioutput<fc<5, input<matrix<double>>>>;
     net_type net;
-    
+
     deserialize(fileName + ".dat") >> net;
 
     // Convert samples to match dlib standards:
@@ -114,9 +114,9 @@ void DnnMulticlass::predict(sample_type &testSamples, std::vector<double> &predi
 
     std::vector<matrix<double>> samples;
 
-    for (auto i=0; i<testSamples.size(); ++i)
+    for (size_t i=0; i<testSamples.size(); ++i)
     {
-        for (auto j=0; j<testSamples.at(i).size(); ++j)
+        for (size_t j=0; j<testSamples.at(i).size(); ++j)
         {
             st_testSamples(j) = testSamples.at(i).at(j);
         }

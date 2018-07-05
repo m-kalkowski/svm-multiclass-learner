@@ -26,8 +26,8 @@ void SvmcOvaLearner::train(sample_type &trainSamples,
     std::vector<matrix<double, 0, 0>> samples;
     std::vector<double> labels;
 
-    for (auto i=0; i<trainSamples.size(); ++i) {
-        for (auto j=0; j<trainSamples.at(i).size(); ++j) {
+    for (size_t i=0; i<trainSamples.size(); ++i) {
+        for (size_t j=0; j<trainSamples.at(i).size(); ++j) {
             featuresVector(j) = trainSamples.at(i).at(j);
         }
         samples.push_back(featuresVector);
@@ -36,7 +36,7 @@ void SvmcOvaLearner::train(sample_type &trainSamples,
     std::string prevLabel = trainLabels.at(0);
     double newLabel = 0;
     labels.push_back(newLabel);
-    for (auto i=1; i<trainLabels.size(); ++i) {
+    for (size_t i=1; i<trainLabels.size(); ++i) {
         std::string currentLabel = trainLabels.at(i);
         if (currentLabel != prevLabel) {
             newLabel++;
@@ -85,8 +85,8 @@ void SvmcOvaLearner::predict(sample_type &testSamples,
 
     std::vector<matrix<double, 0, 0>> samples;
 
-    for (auto i=0; i<testSamples.size(); ++i) {
-        for (auto j=0; j<testSamples.at(i).size(); ++j) {
+    for (size_t i=0; i<testSamples.size(); ++i) {
+        for (size_t j=0; j<testSamples.at(i).size(); ++j) {
             featuresVector(j) = testSamples.at(i).at(j);
         }
         samples.push_back(featuresVector);
