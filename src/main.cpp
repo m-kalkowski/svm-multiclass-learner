@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
     MainWindow m;
     m.show();
 
-    QFile f(":qdarkstyle/style.qss");
+    QFile f("layout/qdarkstyle/style.qss");
     if (!f.exists())
     {
         printf("Unable to set stylesheet, file not found\n");
@@ -21,6 +21,6 @@ int main(int argc, char *argv[])
         QTextStream ts(&f);
         a.setStyleSheet(ts.readAll());
     }
-    
+
     return a.exec();
 }
