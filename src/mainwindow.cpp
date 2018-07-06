@@ -37,6 +37,11 @@ MainWindow::MainWindow(QWidget *parent) :
             this,
             SLOT(onFeaturesFileDoubleClicked(const QModelIndex &)));
 
+    connect(ui->models,
+            SIGNAL(doubleClicked(const QModelIndex &)),
+            this,
+            SLOT(onModelsFileDoubleClicked(const QModelIndex &)));
+
     connect(m_table.verticalHeader(),
             SIGNAL(sectionClicked(int)),
             this,
@@ -116,6 +121,12 @@ void MainWindow::onFeaturesFileDoubleClicked(const QModelIndex & index)
 
     populateTable();
     m_table.update();
+}
+
+void MainWindow::onModelsFileDoubleClicked(const QModelIndex & index)
+{
+    m_modelName = m_modelsModel.filePath(index).toStdString();
+    std::cout << m_modelName << std::endl;
 }
 
 void MainWindow::onTableWidgetDoubleClicked(int row)
@@ -394,7 +405,7 @@ void MainWindow::onGenerateResultsButtonClicked()
     sample_type testSamples = m_featuresParser.getTestSamples();
     label_type testLabels = m_featuresParser.getTestLabels();
 
-    m_dnnMulticlass.predict(testSamples, predictedLabels, "./models/dnn-all-df");
+    m_svmcOvaLearner.predict(testSamples, predictedLabels, "./models/svm_c-ova-all");
 
     for (size_t i=0; i<testLabels.size(); ++i)
         std::cout << "true label: " << testLabels.at(i) << ", predicted label: " << predictedLabels.at(i) << std::endl;
