@@ -68,6 +68,7 @@ private:
     QSplitter m_splitter;
     std::string m_fileName;
     std::string m_modelName;
+    std::string m_modelPath;
     int m_row;
     int m_xAxisSize;
 };

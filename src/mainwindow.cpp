@@ -1,4 +1,8 @@
 #include "mainwindow.h"
+#include "svmc-ova-learner.h"
+#include "svmc-ovo-learner.h"
+#include "svmnu-ova-learner.h"
+#include "svmnu-ovo-learner.h"
 #include "qcustomplot.h"
 #include "ui_mainwindow.h"
 
@@ -15,6 +19,7 @@ namespace {
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
+    m_fileName(""),
     m_row(0),
     m_xAxisSize(0)
 {
@@ -115,7 +120,6 @@ void MainWindow::onFeaturesFileDoubleClicked(const QModelIndex & index)
     int channels = m_featuresParser.channels();
     m_table.setColumnCount(FeaturesParser::numOfFeatures*channels + 1);
 
-
     int rowCount = m_featuresParser.getAllSamples().size();
     m_table.setRowCount(rowCount);
 
@@ -125,8 +129,16 @@ void MainWindow::onFeaturesFileDoubleClicked(const QModelIndex & index)
 
 void MainWindow::onModelsFileDoubleClicked(const QModelIndex & index)
 {
-    m_modelName = m_modelsModel.filePath(index).toStdString();
-    std::cout << m_modelName << std::endl;
+    m_modelPath = m_modelsModel.filePath(index).toStdString();
+    m_modelName = m_modelsModel.fileName(index).toStdString();
+    if (m_modelName == "svm_c-ova-all.dat" || m_modelName == "svm_c-ova-signal.dat")
+        m_machineLearnersManager.registerMachineLearner(std::make_shared<SvmcOvaLearner>(), m_modelName);
+    if (m_modelName == "svm_c-ovo-all.dat" || m_modelName == "svm_c-ovo-signal.dat")
+        m_machineLearnersManager.registerMachineLearner(std::make_shared<SvmcOvoLearner>(), m_modelName);
+    if (m_modelName == "svm_nu-ova-all.dat" || m_modelName == "svm_nu-ova-signal.dat")
+        m_machineLearnersManager.registerMachineLearner(std::make_shared<SvmnuOvaLearner>(), m_modelName);
+    if (m_modelName == "svm_nu-ovo-all.dat" || m_modelName == "svm_nu-ovo-signal.dat")
+        m_machineLearnersManager.registerMachineLearner(std::make_shared<SvmnuOvoLearner>(), m_modelName);
 }
 
 void MainWindow::onTableWidgetDoubleClicked(int row)
@@ -154,7 +166,7 @@ void MainWindow::plot(QVector<double> &x, QVector<double> &y)
 
     int channels = m_featuresParser.channels();
     for (auto i=0; i<channels; ++i) {
-        for (auto j=0; j<FeaturesParser::numOfFeatures*channels; j+=channels)
+        for (auto j=0; j<y.size(); j+=channels)
             frameOneChannel.push_back(y.at(j + i));
 
         plot->addGraph();
@@ -263,140 +275,34 @@ void MainWindow::onRangeChanged(const QCPRange &newRange)
 
 void MainWindow::onPlotSignalButtonClicked()
 {
-
-   /* sample_type signal;
+    sample_type signal;
     label_type label;
     label_type testLabels = m_featuresParser.getTestLabels();
     sample_type testSamples =  m_featuresParser.getTestSamples();
 
-    int numOfFrames = ui->numOfFrames->value();
+    size_t numOfFrames = ui->numOfFrames->value();
 
-    for (int i=0; i<numOfFrames; ++i)
-    {
-        int randomFrameNumber = 1 + (rand() % testLabels.size() - 1);
+    for (size_t i=0; i<numOfFrames; ++i) {
+        size_t randomFrameNumber = 1 + (rand() % testLabels.size() - 1);
         signal.push_back(testSamples.at(randomFrameNumber));
         label.push_back(testLabels.at(randomFrameNumber));
-    }*/
-
-    /*std::vector<double> predictedLabels;
-
-    m_svmMulticlass.predict(signal, predictedLabels, "./models/svm-all-df");
-
-    for (auto i=0; i<label.size(); ++i)
-        std::cout << "true label: " << label.at(i) << ", predicted label: " << predictedLabels.at(i) << std::endl;
-    */
-
-   /* QCustomPlot *plot = (QCustomPlot *)ui->tabWidget->widget(0);
-    plot->clearPlottables();
-    plot->clearItems();
+    }
 
     QVector<double> x;
-    double step = 0;
-    for (size_t i=0; i<FeaturesParser::numOfFeatures * label.size(); ++i)
-    {
-        x.push_back(step);
-        step += 2;
+    double time = 0;
+    for (size_t i=0; i<FeaturesParser::numOfFeatures * label.size(); ++i) {
+        x.push_back(time);
+        time += timeStepMs;
     }
 
-    m_xAxisSize = x.back();
+    std::vector<double> a;
+    for (auto s : signal)
+        a.insert(a.end(), s.begin(), s.end());
 
-    switch (ui->features->currentRow())
-    {
-        case eDIFF_CHANNEL:
-        {
-            std::vector<double> a;
-            for (auto s : signal)
-            {
-                a.insert(a.end(), s.begin(), s.end());
-            }
-            QVector<double> y = QVector<double>::fromStdVector(a);
-            plot->addGraph();
-            plot->graph(0)->setData(x, y);
-            break;
-        }
-        case eALL_CHANNELS:
-        {
-            std::vector<double> a;
-            for (auto s : signal)
-            {
-                a.insert(a.end(), s.begin(), s.end());
-            }
-            QVector<double> all = QVector<double>::fromStdVector(a);
-            QVector<double> diff, high, low;
-            for (auto i=0; i<all.size(); i+=3)
-            {
-                high.push_back(all.at(i));
-                low.push_back(all.at(i + 1));
-                diff.push_back(all.at(i + 2));
-            }
+    QVector<double> y = QVector<double>::fromStdVector(a);
 
-            plot->addGraph();
-            plot->graph(0)->setPen(QPen(Qt::blue));
-            plot->graph(0)->setData(x, high);
-            plot->addGraph();
-            plot->graph(1)->setPen(QPen(Qt::red));
-            plot->graph(1)->setData(x, low);
-            plot->addGraph();
-            plot->graph(2)->setPen(QPen(Qt::green));
-            plot->graph(2)->setData(x, diff);
-            break;
-        }
-        case eSIGNAL_CHANNELS:
-        {
-            std::vector<double> a;
-            for (auto s : signal)
-            {
-                a.insert(a.end(), s.begin(), s.end());
-            }
-            QVector<double> all = QVector<double>::fromStdVector(a);
-            QVector<double> high, low;
-            for (auto i=0; i<all.size(); i+=2)
-            {
-                high.push_back(all.at(i));
-                low.push_back(all.at(i + 1));
-            }
-            plot->addGraph();
-            plot->graph(0)->setPen(QPen(Qt::blue));
-            plot->graph(0)->setData(x, high);
-            plot->addGraph();
-            plot->graph(1)->setPen(QPen(Qt::red));
-            plot->graph(1)->setData(x, low);
-            break;
-        }
-    }
-
-    plot->axisRect()->setRangeZoom(Qt::Horizontal);
-    plot->axisRect()->setRangeDrag(Qt::Horizontal);
-
-    plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
-
-
-
-    std::vector<QCPItemRect*> section;
-    for (int i=0; i<label.size(); ++i)
-    {
-        section.push_back(new QCPItemRect(plot));
-        section.back()->topLeft->setType(QCPItemPosition::ptPlotCoords);
-        section.back()->topLeft->setAxes(plot->xAxis, plot->yAxis);
-        section.back()->bottomRight->setType(QCPItemPosition::ptPlotCoords);
-        section.back()->bottomRight->setAxes(plot->xAxis, plot->yAxis);
-        section.back()->topLeft->setCoords(i*319*2 + 7, 3300);
-        section.back()->bottomRight->setCoords(319*2 * (i + 1) - 7, -3300);
-        section.back()->setBrush(QBrush(QColor(0,200,0,100)));
-        section.back()->setPen(Qt::NoPen);
-        section.back()->setLayer("sectionBackground");
-    }
-
-    plot->addLayer("sectionBackground", plot->layer("grid"), QCustomPlot::limBelow);
-
-    // give the axes some labels:
-    plot->xAxis->setLabel("x");
-    plot->yAxis->setLabel("y");
-    // set axes ranges, so we see all data:
-    plot->xAxis->setRange(0, x.back());
-    plot->yAxis->setRange(-3300, 3300);
-    plot->replot();
-*/
+    std::cout << y.size() << std::endl;
+    plot(x, y);
 }
 
 void MainWindow::onGenerateResultsButtonClicked()
@@ -405,8 +311,23 @@ void MainWindow::onGenerateResultsButtonClicked()
     sample_type testSamples = m_featuresParser.getTestSamples();
     label_type testLabels = m_featuresParser.getTestLabels();
 
-    m_svmcOvaLearner.predict(testSamples, predictedLabels, "./models/svm_c-ova-all");
+    if (testSamples.size() == 0 || testLabels.size() == 0 || m_fileName == "") {
+        std::cout << "No features file provided or features file empty." << std::endl;
+        return;
+    }
+
+    std::shared_ptr<IMachineLearner> machineLearner =
+        m_machineLearnersManager.getMachineLearner(m_modelName);
+
+    if (machineLearner == nullptr) {
+        std::cout << "No model selected." << std::endl;
+        return;
+    }
+
+    machineLearner->predict(testSamples, predictedLabels, m_modelPath);
 
     for (size_t i=0; i<testLabels.size(); ++i)
-        std::cout << "true label: " << testLabels.at(i) << ", predicted label: " << predictedLabels.at(i) << std::endl;
+        std::cout << "true label: " << testLabels.at(i)
+                  << ", predicted label: " << predictedLabels.at(i)
+                  << std::endl;
 }
