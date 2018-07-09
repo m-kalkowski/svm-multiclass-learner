@@ -160,7 +160,12 @@ void MainWindow::plot(QVector<double> &x, QVector<double> &y)
     QCustomPlot *plot = (QCustomPlot *)ui->tabWidget->widget(0);
     plot->clearPlottables();
 
+    plot->axisRect()->setRangeZoom(Qt::Horizontal);
+    plot->axisRect()->setRangeDrag(Qt::Horizontal);
+    plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
+
     QColor colors[] = {Qt::blue, Qt::red, Qt::green};
+    m_xAxisSize = x.back();
 
     QVector<double> frameOneChannel;
 
