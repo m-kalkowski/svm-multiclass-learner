@@ -13,7 +13,7 @@ MachineLearnersManager::~MachineLearnersManager()
 
 }
 
-IMachineLearner * getMachineLearner(std::string machineLearnerName)
+IMachineLearner * MachineLearnersManager::getMachineLearner(std::string machineLearnerName)
 {
     auto result = m_machineLearners.find(machineLearnerName);
     if (result != m_machineLearners.end())
@@ -22,11 +22,11 @@ IMachineLearner * getMachineLearner(std::string machineLearnerName)
         return nullptr;
 }
 
-void registerMachineLearner(IMachineLearner *machineLearner, std::string machineLearnerName)
+void MachineLearnersManager::registerMachineLearner(IMachineLearner *machineLearner, std::string machineLearnerName)
 {
     auto result = m_machineLearners.find(machineLearnerName);
     if (result == m_machineLearners.end())
         m_machineLearners[machineLearnerName] = machineLearner;
     else
-        std::cout << "Machine learner with name provided already exists." << std::endl
+        std::cout << "Machine learner with name provided already exists." << std::endl;
 }
