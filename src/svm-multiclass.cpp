@@ -75,7 +75,7 @@ void SvmMulticlass::predict(sample_type &testSamples, std::vector<double> &predi
     typedef linear_kernel<matrix<double, 0, 0>> kernel_type;
     multiclass_linear_decision_function<kernel_type, double> df;
 
-    deserialize(fileName + ".dat") >> df;
+    deserialize(fileName) >> df;
 
     // Convert samples to match dlib standards:
     matrix<double, 0, 0> st_testSamples;

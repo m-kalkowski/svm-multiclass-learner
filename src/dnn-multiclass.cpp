@@ -106,7 +106,7 @@ void DnnMulticlass::predict(sample_type &testSamples, std::vector<double> &predi
     using net_type = loss_mean_squared_multioutput<fc<5, input<matrix<double>>>>;
     net_type net;
 
-    deserialize(fileName + ".dat") >> net;
+    deserialize(fileName) >> net;
 
     // Convert samples to match dlib standards:
     matrix<double> st_testSamples;

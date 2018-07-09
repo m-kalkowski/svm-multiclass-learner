@@ -78,7 +78,7 @@ void SvmcOvoLearner::predict(sample_type &testSamples,
     typedef radial_basis_kernel<matrix<double, 0, 0>> rbf_kernel;
 
     normalized_function<one_vs_one_decision_function<ovo_trainer, decision_function<rbf_kernel>>> df;
-    deserialize(modelName + ".dat") >> df;
+    deserialize(modelName) >> df;
 
     matrix<double, 0, 0> featuresVector;
     featuresVector.set_size(testSamples.at(0).size(), 1);
