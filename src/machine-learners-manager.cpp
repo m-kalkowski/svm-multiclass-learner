@@ -13,7 +13,8 @@ MachineLearnersManager::~MachineLearnersManager()
 
 }
 
-IMachineLearner * MachineLearnersManager::getMachineLearner(std::string machineLearnerName)
+std::shared_ptr<IMachineLearner> MachineLearnersManager::getMachineLearner(
+        std::string machineLearnerName)
 {
     auto result = m_machineLearners.find(machineLearnerName);
     if (result != m_machineLearners.end())
@@ -22,7 +23,9 @@ IMachineLearner * MachineLearnersManager::getMachineLearner(std::string machineL
         return nullptr;
 }
 
-void MachineLearnersManager::registerMachineLearner(IMachineLearner *machineLearner, std::string machineLearnerName)
+void MachineLearnersManager::registerMachineLearner(
+        std::shared_ptr<IMachineLearner> machineLearner,
+        std::string machineLearnerName)
 {
     auto result = m_machineLearners.find(machineLearnerName);
     if (result == m_machineLearners.end())
