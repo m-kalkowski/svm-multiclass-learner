@@ -46,6 +46,7 @@ LDFLAGS += \
 	-lmlpack
 
 SOURCE += \
+    src/machine-learners-manager.cpp \
     src/svm-multiclass.cpp \
 	src/svmc-ova-learner.cpp \
 	src/svmc-ovo-learner.cpp \
@@ -63,6 +64,7 @@ SOURCE += \
 
 HEADERS += \
 	include/features-parser.h \
+    include/machine-learners-manager.h \
 	include/i-machine-learner.h \
 	include/mainwindow.h \
 	include/qcustomplot.h \
