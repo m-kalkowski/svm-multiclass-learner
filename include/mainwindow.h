@@ -2,11 +2,8 @@
 #define MAINWINDOW_H
 
 #include "features-parser.h"
+#include "machine-learners-manager.h"
 #include "svm-multiclass.h"
-#include "svmc-ova-learner.h"
-#include "svmc-ovo-learner.h"
-#include "svmnu-ova-learner.h"
-#include "svmnu-ovo-learner.h"
 #include "dnn-multiclass.h"
 
 #include <QMainWindow>
@@ -15,6 +12,7 @@
 #include <QTableWidgetItem>
 #include <QFileSystemModel>
 #include <QSplitter>
+
 
 class QCPRange;
 
@@ -61,10 +59,7 @@ private:
     QTableWidget m_table;
     FeaturesParser m_featuresParser;
 
-    SvmcOvaLearner m_svmcOvaLearner;
-    SvmcOvoLearner m_svmcOvoLearner;
-    SvmnuOvaLearner m_svmnuOvaLearner;
-    SvmnuOvoLearner m_svmnuOvoLearner;
+    MachineLearnersManager m_machineLearnersManager;
 
     SvmMulticlass m_svmMulticlass;
     DnnMulticlass m_dnnMulticlass;
