@@ -21,7 +21,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
     m_fileName(""),
     m_row(0),
-    m_xAxisSize(0)
+    m_xAxisSize(0),
+    m_currentSamples(0),
+    m_currentLabels(0)
 {
     ui->setupUi(this);
 
@@ -129,16 +131,20 @@ void MainWindow::onFeaturesFileDoubleClicked(const QModelIndex & index)
 
 void MainWindow::onModelsFileDoubleClicked(const QModelIndex & index)
 {
-    m_modelPath = m_modelsModel.filePath(index).toStdString();
-    m_modelName = m_modelsModel.fileName(index).toStdString();
-    if (m_modelName == "svm_c-ova-all.dat" || m_modelName == "svm_c-ova-signal.dat")
-        m_machineLearnersManager.registerMachineLearner(std::make_shared<SvmcOvaLearner>(), m_modelName);
-    if (m_modelName == "svm_c-ovo-all.dat" || m_modelName == "svm_c-ovo-signal.dat")
-        m_machineLearnersManager.registerMachineLearner(std::make_shared<SvmcOvoLearner>(), m_modelName);
-    if (m_modelName == "svm_nu-ova-all.dat" || m_modelName == "svm_nu-ova-signal.dat")
-        m_machineLearnersManager.registerMachineLearner(std::make_shared<SvmnuOvaLearner>(), m_modelName);
-    if (m_modelName == "svm_nu-ovo-all.dat" || m_modelName == "svm_nu-ovo-signal.dat")
-        m_machineLearnersManager.registerMachineLearner(std::make_shared<SvmnuOvoLearner>(), m_modelName);
+    std::string modelPath = m_modelsModel.filePath(index).toStdString();
+    std::string modelName = m_modelsModel.fileName(index).toStdString();
+    if (modelName == "svm_c-ova-all.dat" || modelName == "svm_c-ova-signal.dat")
+        m_machineLearnersManager.registerMachineLearner(std::make_shared<SvmcOvaLearner>(), modelName);
+    if (modelName == "svm_c-ovo-all.dat" || modelName == "svm_c-ovo-signal.dat")
+        m_machineLearnersManager.registerMachineLearner(std::make_shared<SvmcOvoLearner>(), modelName);
+    if (modelName == "svm_nu-ova-all.dat" || modelName == "svm_nu-ova-signal.dat")
+        m_machineLearnersManager.registerMachineLearner(std::make_shared<SvmnuOvaLearner>(), modelName);
+    if (modelName == "svm_nu-ovo-all.dat" || modelName == "svm_nu-ovo-signal.dat")
+        m_machineLearnersManager.registerMachineLearner(std::make_shared<SvmnuOvoLearner>(), modelName);
+
+    std::map<std::string, std::string>::iterator it = m_models.find(modelName);
+    if (it == m_models.end())
+        m_models[modelName] = modelPath;
 }
 
 void MainWindow::onTableWidgetDoubleClicked(int row)
@@ -268,7 +274,11 @@ void MainWindow::onPlotTestButtonClicked()
         time += timeStepMs;
     }
 
-    QVector<double> y = QVector<double>::fromStdVector(m_featuresParser.getTestSamples().at(row));
+    std::vector<double> selectedTestSamples = m_featuresParser.getTestSamples().at(row);
+    QVector<double> y = QVector<double>::fromStdVector(selectedTestSamples);
+
+    m_currentLabels.push_back(m_featuresParser.getTestLabels().at(row));
+    m_currentSamples.push_back(m_featuresParser.getTestSamples().at(row));
 
     plot(x, y);
 }
@@ -306,33 +316,35 @@ void MainWindow::onPlotSignalButtonClicked()
 
     QVector<double> y = QVector<double>::fromStdVector(a);
 
-    std::cout << y.size() << std::endl;
+    m_currentLabels = label;
+    m_currentSamples = signal;
+
     plot(x, y);
 }
 
 void MainWindow::onGenerateResultsButtonClicked()
 {
     std::vector<double> predictedLabels;
-    sample_type testSamples = m_featuresParser.getTestSamples();
-    label_type testLabels = m_featuresParser.getTestLabels();
 
-    if (testSamples.size() == 0 || testLabels.size() == 0 || m_fileName == "") {
-        std::cout << "No features file provided or features file empty." << std::endl;
+    if (m_currentSamples.size() == 0 || m_fileName == "") {
+        std::cout << "No samples selected or features file empty." << std::endl;
         return;
     }
 
-    std::shared_ptr<IMachineLearner> machineLearner =
-        m_machineLearnersManager.getMachineLearner(m_modelName);
+    //std::shared_ptr<IMachineLearner> machineLearner =
+    //    m_machineLearnersManager.getMachineLearner(m_modelName);
 
-    if (machineLearner == nullptr) {
-        std::cout << "No model selected." << std::endl;
-        return;
-    }
+    //if (machineLearner == nullptr) {
+    //    std::cout << "No model selected." << std::endl;
+    //    return;
+    //}
 
-    machineLearner->predict(testSamples, predictedLabels, m_modelPath);
+    //machineLearner->predict(m_currentSamples, predictedLabels, m_modelPath);
 
-    for (size_t i=0; i<testLabels.size(); ++i)
-        std::cout << "true label: " << testLabels.at(i)
+    //ui->results->
+
+    for (size_t i=0; i<m_currentSamples.size(); ++i)
+        std::cout << "true label: " << m_currentLabels.at(i)
                   << ", predicted label: " << predictedLabels.at(i)
                   << std::endl;
 }

@@ -59,6 +59,9 @@ private:
     QTableWidget m_table;
     FeaturesParser m_featuresParser;
 
+    sample_type m_currentSamples;
+    label_type m_currentLabels;
+
     MachineLearnersManager m_machineLearnersManager;
 
     SvmMulticlass m_svmMulticlass;
@@ -67,8 +70,9 @@ private:
     QFileSystemModel m_modelsModel;
     QSplitter m_splitter;
     std::string m_fileName;
-    std::string m_modelName;
-    std::string m_modelPath;
+
+    std::map<std::string, std::string> m_models;
+
     int m_row;
     int m_xAxisSize;
 };
