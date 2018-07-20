@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>475</width>
-    <height>575</height>
+    <width>742</width>
+    <height>616</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,267 +15,7 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
-     <widget class="QSplitter" name="splitter_2">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <widget class="QSplitter" name="splitter">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <widget class="QTreeView" name="features">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>10</pointsize>
-         </font>
-        </property>
-       </widget>
-       <widget class="QTreeView" name="models">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>10</pointsize>
-         </font>
-        </property>
-       </widget>
-       <widget class="QGroupBox" name="randomSignal">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>170</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>10</pointsize>
-         </font>
-        </property>
-        <property name="title">
-         <string>Test Frame</string>
-        </property>
-        <property name="flat">
-         <bool>true</bool>
-        </property>
-        <property name="checkable">
-         <bool>false</bool>
-        </property>
-        <widget class="QRadioButton" name="rb1">
-         <property name="geometry">
-          <rect>
-           <x>17</x>
-           <y>25</y>
-           <width>227</width>
-           <height>18</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>jeden rezystor 120</string>
-         </property>
-        </widget>
-        <widget class="QRadioButton" name="rb2">
-         <property name="geometry">
-          <rect>
-           <x>17</x>
-           <y>49</y>
-           <width>227</width>
-           <height>17</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>rezystancja 60</string>
-         </property>
-        </widget>
-        <widget class="QRadioButton" name="rb3">
-         <property name="geometry">
-          <rect>
-           <x>17</x>
-           <y>72</y>
-           <width>227</width>
-           <height>17</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>rezystor 10k</string>
-         </property>
-        </widget>
-        <widget class="QRadioButton" name="rb4">
-         <property name="geometry">
-          <rect>
-           <x>17</x>
-           <y>95</y>
-           <width>227</width>
-           <height>18</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>zwarcie CAN L do masy przez 110</string>
-         </property>
-        </widget>
-        <widget class="QRadioButton" name="rb5">
-         <property name="geometry">
-          <rect>
-           <x>17</x>
-           <y>119</y>
-           <width>227</width>
-           <height>17</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>oba zwarte przez rezystor 110</string>
-         </property>
-        </widget>
-        <widget class="QPushButton" name="plotTestButton">
-         <property name="geometry">
-          <rect>
-           <x>17</x>
-           <y>140</y>
-           <width>112</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>Plot Test Frame</string>
-         </property>
-        </widget>
-       </widget>
-       <widget class="QGroupBox" name="testSignal">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>120</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>10</pointsize>
-         </font>
-        </property>
-        <property name="title">
-         <string>Test Signal</string>
-        </property>
-        <widget class="QSpinBox" name="numOfFrames">
-         <property name="geometry">
-          <rect>
-           <x>17</x>
-           <y>52</y>
-           <width>52</width>
-           <height>24</height>
-          </rect>
-         </property>
-         <property name="minimum">
-          <number>1</number>
-         </property>
-         <property name="maximum">
-          <number>100</number>
-         </property>
-        </widget>
-        <widget class="QLabel" name="label">
-         <property name="geometry">
-          <rect>
-           <x>17</x>
-           <y>25</y>
-           <width>107</width>
-           <height>16</height>
-          </rect>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>number of frames</string>
-         </property>
-        </widget>
-        <widget class="QPushButton" name="plotSignalButton">
-         <property name="geometry">
-          <rect>
-           <x>17</x>
-           <y>82</y>
-           <width>110</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Plot Test Signal</string>
-         </property>
-        </widget>
-       </widget>
-      </widget>
-      <widget class="QTabWidget" name="tabWidget">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
-       <property name="styleSheet">
-        <string notr="true"/>
-       </property>
-       <property name="currentIndex">
-        <number>0</number>
-       </property>
-       <widget class="QCustomPlot" name="plot">
-        <attribute name="title">
-         <string>Plot</string>
-        </attribute>
-       </widget>
-      </widget>
-     </widget>
-    </item>
-    <item row="1" column="0">
+    <item row="2" column="0" colspan="2">
      <widget class="QPushButton" name="generateResultsButton">
       <property name="font">
        <font>
@@ -287,6 +27,292 @@
       </property>
      </widget>
     </item>
+    <item row="1" column="0">
+     <layout class="QFormLayout" name="formLayout">
+      <item row="0" column="0">
+       <widget class="QSplitter" name="splitter_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <widget class="QSplitter" name="splitter">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Ignored" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <widget class="QTreeView" name="features">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+         </widget>
+         <widget class="QTreeView" name="models">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+         </widget>
+         <widget class="QGroupBox" name="randomSignal">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>170</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="title">
+           <string>Test Frame</string>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
+          </property>
+          <property name="checkable">
+           <bool>false</bool>
+          </property>
+          <widget class="QRadioButton" name="rb1">
+           <property name="geometry">
+            <rect>
+             <x>17</x>
+             <y>30</y>
+             <width>227</width>
+             <height>18</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>jeden rezystor 120</string>
+           </property>
+          </widget>
+          <widget class="QRadioButton" name="rb2">
+           <property name="geometry">
+            <rect>
+             <x>17</x>
+             <y>50</y>
+             <width>227</width>
+             <height>17</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>rezystancja 60</string>
+           </property>
+          </widget>
+          <widget class="QRadioButton" name="rb3">
+           <property name="geometry">
+            <rect>
+             <x>17</x>
+             <y>70</y>
+             <width>227</width>
+             <height>17</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>rezystor 10k</string>
+           </property>
+          </widget>
+          <widget class="QRadioButton" name="rb4">
+           <property name="geometry">
+            <rect>
+             <x>17</x>
+             <y>90</y>
+             <width>227</width>
+             <height>18</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>zwarcie CAN L do masy przez 110</string>
+           </property>
+          </widget>
+          <widget class="QRadioButton" name="rb5">
+           <property name="geometry">
+            <rect>
+             <x>17</x>
+             <y>110</y>
+             <width>227</width>
+             <height>17</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>oba zwarte przez rezystor 110</string>
+           </property>
+          </widget>
+          <widget class="QPushButton" name="plotTestButton">
+           <property name="geometry">
+            <rect>
+             <x>17</x>
+             <y>130</y>
+             <width>112</width>
+             <height>31</height>
+            </rect>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Plot Test Frame</string>
+           </property>
+          </widget>
+         </widget>
+         <widget class="QGroupBox" name="testSignal">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>120</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="title">
+           <string>Test Signal</string>
+          </property>
+          <widget class="QSpinBox" name="numOfFrames">
+           <property name="geometry">
+            <rect>
+             <x>17</x>
+             <y>40</y>
+             <width>52</width>
+             <height>24</height>
+            </rect>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>100</number>
+           </property>
+          </widget>
+          <widget class="QLabel" name="label">
+           <property name="geometry">
+            <rect>
+             <x>17</x>
+             <y>20</y>
+             <width>107</width>
+             <height>16</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>number of frames</string>
+           </property>
+          </widget>
+          <widget class="QPushButton" name="plotSignalButton">
+           <property name="geometry">
+            <rect>
+             <x>17</x>
+             <y>70</y>
+             <width>110</width>
+             <height>31</height>
+            </rect>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Plot Test Signal</string>
+           </property>
+          </widget>
+         </widget>
+        </widget>
+        <widget class="QTabWidget" name="tabWidget">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
+         <widget class="QCustomPlot" name="plot">
+          <attribute name="title">
+           <string>Plot</string>
+          </attribute>
+         </widget>
+        </widget>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QListView" name="listView"/>
+        </item>
+        <item>
+         <widget class="QColumnView" name="columnView"/>
+        </item>
+        <item>
+         <widget class="QListView" name="listView_2"/>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -294,7 +320,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>475</width>
+     <width>742</width>
      <height>25</height>
     </rect>
    </property>
