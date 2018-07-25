@@ -301,7 +301,7 @@
       <item row="0" column="1">
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <widget class="QListView" name="listView"/>
+         <widget class="QListWidget" name="selectedModels"/>
         </item>
         <item>
          <widget class="QColumnView" name="columnView"/>

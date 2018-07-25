@@ -119,6 +119,8 @@ void MainWindow::onFeaturesFileDoubleClicked(const QModelIndex & index)
         return;
     }
 
+    std::cout << m_fileName << std::endl;
+
     int channels = m_featuresParser.channels();
     m_table.setColumnCount(FeaturesParser::numOfFeatures*channels + 1);
 
@@ -132,7 +134,7 @@ void MainWindow::onFeaturesFileDoubleClicked(const QModelIndex & index)
 void MainWindow::onModelsFileDoubleClicked(const QModelIndex & index)
 {
     std::string modelPath = m_modelsModel.filePath(index).toStdString();
-    std::string modelName = m_modelsModel.fileName(index).toStdString();
+    std::string modelName = QFileInfo(m_modelsModel.filePath(index)).fileName().toStdString();
     if (modelName == "svm_c-ova-all.dat" || modelName == "svm_c-ova-signal.dat")
         m_machineLearnersManager.registerMachineLearner(std::make_shared<SvmcOvaLearner>(), modelName);
     if (modelName == "svm_c-ovo-all.dat" || modelName == "svm_c-ovo-signal.dat")
@@ -143,8 +145,10 @@ void MainWindow::onModelsFileDoubleClicked(const QModelIndex & index)
         m_machineLearnersManager.registerMachineLearner(std::make_shared<SvmnuOvoLearner>(), modelName);
 
     std::map<std::string, std::string>::iterator it = m_models.find(modelName);
-    if (it == m_models.end())
+    if (it == m_models.end()) {
         m_models[modelName] = modelPath;
+        ui->selectedModels->addItem(QString::fromStdString(modelName));
+    }
 }
 
 void MainWindow::onTableWidgetDoubleClicked(int row)
@@ -324,12 +328,12 @@ void MainWindow::onPlotSignalButtonClicked()
 
 void MainWindow::onGenerateResultsButtonClicked()
 {
-    std::vector<double> predictedLabels;
+    //std::vector<double> predictedLabels;
 
-    if (m_currentSamples.size() == 0 || m_fileName == "") {
-        std::cout << "No samples selected or features file empty." << std::endl;
-        return;
-    }
+    //if (m_currentSamples.size() == 0 || m_fileName == "") {
+    //    std::cout << "No samples selected or features file empty." << std::endl;
+    //    return;
+    //}
 
     //std::shared_ptr<IMachineLearner> machineLearner =
     //    m_machineLearnersManager.getMachineLearner(m_modelName);
@@ -342,9 +346,11 @@ void MainWindow::onGenerateResultsButtonClicked()
     //machineLearner->predict(m_currentSamples, predictedLabels, m_modelPath);
 
     //ui->results->
+    for (auto m : m_models)
+        std::cout << m.first << "   " << m.second << std::endl;
 
-    for (size_t i=0; i<m_currentSamples.size(); ++i)
-        std::cout << "true label: " << m_currentLabels.at(i)
-                  << ", predicted label: " << predictedLabels.at(i)
-                  << std::endl;
+    //for (size_t i=0; i<m_currentSamples.size(); ++i)
+    //    std::cout << "true label: " << m_currentLabels.at(i)
+    //              << ", predicted label: " << predictedLabels.at(i)
+    //              << std::endl;
 }
