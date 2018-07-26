@@ -119,7 +119,10 @@ void MainWindow::onFeaturesFileDoubleClicked(const QModelIndex & index)
         return;
     }
 
-    std::cout << m_fileName << std::endl;
+    if (std::find(m_featureNames.begin(), m_featureNames.end(), m_fileName) == m_featureNames.end()) {
+        m_featureNames.push_back(m_fileName);
+        ui->selectedFeatures->addItem(QFileInfo(QString::fromStdString(m_fileName)).fileName());
+    }
 
     int channels = m_featuresParser.channels();
     m_table.setColumnCount(FeaturesParser::numOfFeatures*channels + 1);

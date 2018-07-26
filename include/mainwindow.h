@@ -71,6 +71,7 @@ private:
     QSplitter m_splitter;
     std::string m_fileName;
 
+    std::vector<std::string> m_featureNames;
     std::map<std::string, std::string> m_models;
 
     int m_row;
