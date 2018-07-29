@@ -255,6 +255,7 @@ void MainWindow::onRb5Clicked()
 
 void MainWindow::onPlotTestButtonClicked()
 {
+    m_signalNumbers.clear();
     int row = 0;
     std::vector<range> ranges = m_featuresParser.getRanges();
     switch (m_eLabel) {
@@ -301,6 +302,7 @@ void MainWindow::onRangeChanged(const QCPRange &newRange)
 
 void MainWindow::onPlotSignalButtonClicked()
 {
+    m_signalNumbers.clear();
     sample_type signal;
     label_type label;
     label_type testLabels = m_featuresParser.getTestLabels();
@@ -338,6 +340,19 @@ void MainWindow::onGenerateResultsButtonClicked()
 {
     std::vector<double> predictedLabels;
 
+    int currentColumn = 0;
+
+    QStringList* labels = new QStringList;
+
+    ui->generatedResults->setRowCount(m_currentLabels.size());
+    ui->generatedResults->setColumnCount(m_models.size() + 1);
+    labels->push_back(QString("True Label"));
+
+    for (size_t i=0; i<m_currentLabels.size(); ++i)
+        ui->generatedResults->setItem(i, currentColumn, new QTableWidgetItem(QString::fromStdString(m_currentLabels.at(i))));
+
+    currentColumn++;
+
     for (auto model : m_models) {
         std::shared_ptr<IMachineLearner> machineLearner =
         m_machineLearnersManager.getMachineLearner(model.first);
@@ -346,11 +361,32 @@ void MainWindow::onGenerateResultsButtonClicked()
         else
             machineLearner->predict(m_currentSamples, predictedLabels, model.second);
 
-        for (size_t i=0; i<m_currentSamples.size(); ++i) {
-            std::cout << "true label: " << m_currentLabels.at(i)
-            << ",\t\t predicted label: " << predictedLabels.at(i)
-            << std::endl;
-        }
+        labels->push_back(QString::fromStdString(model.first));
+
+        for (size_t i=0; i<m_currentLabels.size(); ++i)
+            ui->generatedResults->setItem(i, currentColumn, new QTableWidgetItem(labelToString(predictedLabels.at(i))));
+
+        currentColumn++;
     }
-    m_signalNumbers.clear();
+
+    ui->generatedResults->setHorizontalHeaderLabels(*labels);
+    currentColumn = 0;
+}
+
+QString MainWindow::labelToString(double label)
+{
+    QString result;
+
+    if (label == 0)
+        result = "jeden rezystor 120";
+    else if (label == 1)
+        result = "rezystancja 60";
+    else if (label == 2)
+        result = "rezystor 10k";
+    else if (label == 3)
+        result = "zwarcie CAN L do masy przez 110";
+    else if (label == 4)
+        result = "oba zwarte przez rezystor 110";
+
+    return result;
 }

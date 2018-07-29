@@ -51,6 +51,7 @@ private slots:
 private:
     void populateTable();
     void plot(QVector<double> &x, QVector<double> &y);
+    QString labelToString(double label);
 
     ELabel m_eLabel;
     EState m_state;
