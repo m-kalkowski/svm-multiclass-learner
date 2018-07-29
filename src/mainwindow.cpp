@@ -3,6 +3,7 @@
 #include "svmc-ovo-learner.h"
 #include "svmnu-ova-learner.h"
 #include "svmnu-ovo-learner.h"
+#include "bayesclassifer.h"
 #include "qcustomplot.h"
 #include "ui_mainwindow.h"
 
@@ -146,6 +147,9 @@ void MainWindow::onModelsFileDoubleClicked(const QModelIndex & index)
         m_machineLearnersManager.registerMachineLearner(std::make_shared<SvmnuOvaLearner>(), modelName);
     if (modelName == "svm_nu-ovo-all.dat" || modelName == "svm_nu-ovo-signal.dat")
         m_machineLearnersManager.registerMachineLearner(std::make_shared<SvmnuOvoLearner>(), modelName);
+    if (modelName == "bayesClasifier")
+        m_machineLearnersManager.registerMachineLearner(std::make_shared<BayesClassifer>(), modelName);
+
 
     std::map<std::string, std::string>::iterator it = m_models.find(modelName);
     if (it == m_models.end()) {
@@ -331,29 +335,18 @@ void MainWindow::onPlotSignalButtonClicked()
 
 void MainWindow::onGenerateResultsButtonClicked()
 {
-    //std::vector<double> predictedLabels;
+    std::vector<double> predictedLabels;
 
-    //if (m_currentSamples.size() == 0 || m_fileName == "") {
-    //    std::cout << "No samples selected or features file empty." << std::endl;
-    //    return;
-    //}
+    for (auto model : m_models) {
+        std::shared_ptr<IMachineLearner> machineLearner =
+        m_machineLearnersManager.getMachineLearner(model.first);
+        machineLearner->predict(m_currentSamples, predictedLabels, model.second);
 
-    //std::shared_ptr<IMachineLearner> machineLearner =
-    //    m_machineLearnersManager.getMachineLearner(m_modelName);
-
-    //if (machineLearner == nullptr) {
-    //    std::cout << "No model selected." << std::endl;
-    //    return;
-    //}
-
-    //machineLearner->predict(m_currentSamples, predictedLabels, m_modelPath);
-
-    //ui->results->
-    for (auto m : m_models)
-        std::cout << m.first << "   " << m.second << std::endl;
-
-    //for (size_t i=0; i<m_currentSamples.size(); ++i)
-    //    std::cout << "true label: " << m_currentLabels.at(i)
-    //              << ", predicted label: " << predictedLabels.at(i)
-    //              << std::endl;
+        for (size_t i=0; i<m_currentSamples.size(); ++i) {
+            std::cout << "model name: " << model.first << std::endl;
+            std::cout << "\t\ttrue label: " << m_currentLabels.at(i)
+            << ", predicted label: " << predictedLabels.at(i)
+            << std::endl;
+        }
+    }
 }
