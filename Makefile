@@ -17,8 +17,8 @@ TARGET = svm-multiclass-learner
 
 CPPFLAGS += \
 	-I include \
+	`pkg-config --cflags opencv` \
 	-I $(DLIB_DIR_NAME) \
-	-I $(MLPACK_INCLUDE_DIR) \
 	-I $(QT_INCLUDE_DIR) \
 	-I $(QT_INCLUDE_DIR)/QtCore \
 	-I $(QT_INCLUDE_DIR)/QtWidgets \
@@ -36,16 +36,17 @@ CPPFLAGS += \
 	-fPIC
 	
 LDFLAGS +=  \
-	-L $(QT_LIB_DIR) \
-	-L $(MLPACK_LIB_DIR)
+	-L /usr/local/lib/ \
+	-L $(QT_LIB_DIR)
 
 LDFLAGS += \
+	-lopencv_core -lopencv_ml \
 	-lQt5Widgets -lQt5Gui -lQt5Core -lQt5PrintSupport -lGL \
 	-lpthread \
-	-lX11 \
-	-lmlpack
-
+	-lX11
+	
 SOURCE += \
+    src/bayesclassifer.cpp \
     src/machine-learners-manager.cpp \
     src/svm-multiclass.cpp \
 	src/svmc-ova-learner.cpp \
@@ -63,6 +64,7 @@ SOURCE += \
 	src/qrc_style.cpp
 
 HEADERS += \
+    include/bayesclassifer.h \
 	include/features-parser.h \
     include/machine-learners-manager.h \
 	include/i-machine-learner.h \
