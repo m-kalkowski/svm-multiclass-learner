@@ -21,7 +21,7 @@ public:
      */
     virtual void train(sample_type &trainSamples,
                        label_type &trainLabels,
-                       std::string modelName) = 0;
+                       std::string modelName) {}
 
     /**
      * @brief Predicts the labels based on input space data
@@ -31,7 +31,10 @@ public:
      */
     virtual void predict(sample_type &testSamples,
                          std::vector<double> &predictedLabels,
-                         std::string modelName) = 0;
+                         std::string modelName) {}
+
+    virtual void predictVector(std::vector<size_t>& signalNumber,
+                         std::vector<double>& predictedLabels) {}
 };
 
 #endif // I_MACHINE_LEARNER
