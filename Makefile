@@ -46,7 +46,7 @@ LDFLAGS += \
 	-lX11
 	
 SOURCE += \
-    src/bayesclassifer.cpp \
+    src/bayesclassifier.cpp \
     src/machine-learners-manager.cpp \
     src/svm-multiclass.cpp \
 	src/svmc-ova-learner.cpp \
@@ -64,7 +64,7 @@ SOURCE += \
 	src/qrc_style.cpp
 
 HEADERS += \
-    include/bayesclassifer.h \
+    include/bayesclassifier.h \
 	include/features-parser.h \
     include/machine-learners-manager.h \
 	include/i-machine-learner.h \
