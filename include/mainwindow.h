@@ -73,6 +73,7 @@ private:
 
     std::vector<std::string> m_featureNames;
     std::map<std::string, std::string> m_models;
+    std::vector<size_t> m_signalNumbers;
 
     int m_row;
     int m_xAxisSize;

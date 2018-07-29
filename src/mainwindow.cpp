@@ -3,7 +3,7 @@
 #include "svmc-ovo-learner.h"
 #include "svmnu-ova-learner.h"
 #include "svmnu-ovo-learner.h"
-#include "bayesclassifer.h"
+#include "bayesclassifier.h"
 #include "qcustomplot.h"
 #include "ui_mainwindow.h"
 
@@ -147,9 +147,8 @@ void MainWindow::onModelsFileDoubleClicked(const QModelIndex & index)
         m_machineLearnersManager.registerMachineLearner(std::make_shared<SvmnuOvaLearner>(), modelName);
     if (modelName == "svm_nu-ovo-all.dat" || modelName == "svm_nu-ovo-signal.dat")
         m_machineLearnersManager.registerMachineLearner(std::make_shared<SvmnuOvoLearner>(), modelName);
-    if (modelName == "bayesClasifier")
-        m_machineLearnersManager.registerMachineLearner(std::make_shared<BayesClassifer>(), modelName);
-
+    if (modelName == "BayesClassifier")
+        m_machineLearnersManager.registerMachineLearner(std::make_shared<BayesClassifier>(modelPath, m_fileName), modelName);
 
     std::map<std::string, std::string>::iterator it = m_models.find(modelName);
     if (it == m_models.end()) {
@@ -290,6 +289,7 @@ void MainWindow::onPlotTestButtonClicked()
 
     m_currentLabels.push_back(m_featuresParser.getTestLabels().at(row));
     m_currentSamples.push_back(m_featuresParser.getTestSamples().at(row));
+    m_signalNumbers.push_back(row);
 
     plot(x, y);
 }
@@ -310,6 +310,7 @@ void MainWindow::onPlotSignalButtonClicked()
 
     for (size_t i=0; i<numOfFrames; ++i) {
         size_t randomFrameNumber = 1 + (rand() % testLabels.size() - 1);
+        m_signalNumbers.push_back(randomFrameNumber);
         signal.push_back(testSamples.at(randomFrameNumber));
         label.push_back(testLabels.at(randomFrameNumber));
     }
@@ -340,13 +341,16 @@ void MainWindow::onGenerateResultsButtonClicked()
     for (auto model : m_models) {
         std::shared_ptr<IMachineLearner> machineLearner =
         m_machineLearnersManager.getMachineLearner(model.first);
-        machineLearner->predict(m_currentSamples, predictedLabels, model.second);
+        if (model.first == "BayesClassifier")
+            machineLearner->predictVector(m_signalNumbers, predictedLabels);
+        else
+            machineLearner->predict(m_currentSamples, predictedLabels, model.second);
 
         for (size_t i=0; i<m_currentSamples.size(); ++i) {
-            std::cout << "model name: " << model.first << std::endl;
-            std::cout << "\t\ttrue label: " << m_currentLabels.at(i)
-            << ", predicted label: " << predictedLabels.at(i)
+            std::cout << "true label: " << m_currentLabels.at(i)
+            << ",\t\t predicted label: " << predictedLabels.at(i)
             << std::endl;
         }
     }
+    m_signalNumbers.clear();
 }
