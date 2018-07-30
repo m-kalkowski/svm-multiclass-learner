@@ -103,6 +103,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->rb4, SIGNAL(clicked()), this, SLOT(onRb4Clicked()));
     connect(ui->rb5, SIGNAL(clicked()), this, SLOT(onRb5Clicked()));
 
+    ui->generatedResults->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
     srand(time(NULL));
 }
 
@@ -171,10 +173,23 @@ void MainWindow::onTableWidgetDoubleClicked(int row)
     plot(x, y);
 }
 
+std::vector<QCPItemLine*> items;
+std::vector<QCPItemText*> textLabels;
+
 void MainWindow::plot(QVector<double> &x, QVector<double> &y)
 {
     QCustomPlot *plot = (QCustomPlot *)ui->tabWidget->widget(0);
-    plot->clearPlottables();
+    for(size_t i=0; i<plot->graphCount(); ++i)
+        plot->graph(i)->data().data()->clear();
+
+    for (auto i : items)
+        delete i;
+
+    for (auto t : textLabels)
+        delete t;
+
+    items.clear();
+    textLabels.clear();
 
     plot->axisRect()->setRangeZoom(Qt::Horizontal);
     plot->axisRect()->setRangeDrag(Qt::Horizontal);
@@ -202,7 +217,7 @@ void MainWindow::plot(QVector<double> &x, QVector<double> &y)
     plot->yAxis->setLabel("V[mV]");
     // set axes ranges, so we see all data:
     plot->xAxis->setRange(0, x.back());
-    plot->yAxis->setRange(-3300, 3300);
+    plot->yAxis->setRange(-3300, 3500);
     plot->replot();
 }
 
@@ -338,6 +353,15 @@ void MainWindow::onPlotSignalButtonClicked()
 
 void MainWindow::onGenerateResultsButtonClicked()
 {
+    for (auto i : items)
+        delete i;
+
+    for (auto t : textLabels)
+        delete t;
+
+    items.clear();
+    textLabels.clear();
+
     std::vector<double> predictedLabels;
 
     int currentColumn = 0;
@@ -371,6 +395,35 @@ void MainWindow::onGenerateResultsButtonClicked()
 
     ui->generatedResults->setHorizontalHeaderLabels(*labels);
     currentColumn = 0;
+
+    QCustomPlot *plot = (QCustomPlot *)ui->tabWidget->widget(0);
+
+    for (size_t i=0; i<m_currentSamples.size(); ++i) {
+        items.push_back(new QCPItemLine(plot));
+        items.back()->setHead(QCPLineEnding(QCPLineEnding::EndingStyle::esNone));
+        items.back()->setTail(QCPLineEnding(QCPLineEnding::EndingStyle::esNone));
+        items.back()->setPen(QPen(QColor(51, 180, 233), 20));
+        items.back()->start->setCoords((300*i + 20)*timeStepMs, 3500);
+        items.back()->end->setCoords((300*i + 300)*timeStepMs, 3500);
+
+        items.push_back(new QCPItemLine(plot));
+        items.back()->setPen(QPen(QColor(51, 180, 233), 2));
+        items.back()->start->setCoords((300*i + 20)*timeStepMs, 3500);
+        items.back()->end->setCoords((300*i + 20)*timeStepMs, -3300);
+
+        items.push_back(new QCPItemLine(plot));
+        items.back()->setPen(QPen(QColor(51, 180, 233), 2));
+        items.back()->start->setCoords((300*i + 300)*timeStepMs, 3500);
+        items.back()->end->setCoords((300*i + 300)*timeStepMs, -3300);
+
+        /*textLabels.push_back(new QCPItemText(plot));
+        textLabels.back()->setPositionAlignment(Qt::AlignTop|Qt::AlignHCenter);
+        textLabels.back()->position->setCoords(150 * timeStepMs, 3490); // place position at center/top of axis rect
+        textLabels.back()->setText("Text Item Demo");
+        textLabels.back()->setFont(QFont(font().family(), 6, QFont::Weight::Bold)); // make font a bit larger
+        textLabels.back()->setColor(QColor(255, 255, 255));*/
+    }
+    plot->replot();
 }
 
 QString MainWindow::labelToString(double label)
