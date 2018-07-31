@@ -173,23 +173,20 @@ void MainWindow::onTableWidgetDoubleClicked(int row)
     plot(x, y);
 }
 
-std::vector<QCPItemLine*> items;
-std::vector<QCPItemText*> textLabels;
-
 void MainWindow::plot(QVector<double> &x, QVector<double> &y)
 {
     QCustomPlot *plot = (QCustomPlot *)ui->tabWidget->widget(0);
     for(size_t i=0; i<plot->graphCount(); ++i)
         plot->graph(i)->data().data()->clear();
 
-    for (auto i : items)
+    for (auto i : m_items)
         delete i;
 
-    for (auto t : textLabels)
+    for (auto t : m_textLabels)
         delete t;
 
-    items.clear();
-    textLabels.clear();
+    m_items.clear();
+    m_textLabels.clear();
 
     plot->axisRect()->setRangeZoom(Qt::Horizontal);
     plot->axisRect()->setRangeDrag(Qt::Horizontal);
@@ -353,14 +350,14 @@ void MainWindow::onPlotSignalButtonClicked()
 
 void MainWindow::onGenerateResultsButtonClicked()
 {
-    for (auto i : items)
+    for (auto i : m_items)
         delete i;
 
-    for (auto t : textLabels)
+    for (auto t : m_textLabels)
         delete t;
 
-    items.clear();
-    textLabels.clear();
+    m_items.clear();
+    m_textLabels.clear();
 
     std::vector<double> predictedLabels;
 
@@ -397,33 +394,55 @@ void MainWindow::onGenerateResultsButtonClicked()
     currentColumn = 0;
 
     QCustomPlot *plot = (QCustomPlot *)ui->tabWidget->widget(0);
+    int l1 = 20;
+    int l2 = 2;
 
     for (size_t i=0; i<m_currentSamples.size(); ++i) {
-        items.push_back(new QCPItemLine(plot));
-        items.back()->setHead(QCPLineEnding(QCPLineEnding::EndingStyle::esNone));
-        items.back()->setTail(QCPLineEnding(QCPLineEnding::EndingStyle::esNone));
-        items.back()->setPen(QPen(QColor(51, 180, 233), 20));
-        items.back()->start->setCoords((300*i + 20)*timeStepMs, 3500);
-        items.back()->end->setCoords((300*i + 300)*timeStepMs, 3500);
+        m_items.push_back(new QCPItemLine(plot));
+        m_items.back()->setHead(QCPLineEnding(QCPLineEnding::EndingStyle::esNone));
+        m_items.back()->setTail(QCPLineEnding(QCPLineEnding::EndingStyle::esNone));
+        m_items.back()->setPen(QPen(QColor(51, 180, 233), 20));
+        m_items.back()->pen().setWidthF(20.0);
+        m_items.back()->start->setCoords((319*i + l2)*timeStepMs, 3500);
+        m_items.back()->end->setCoords((319*i + 319 - l1)*timeStepMs, 3500);
 
-        items.push_back(new QCPItemLine(plot));
-        items.back()->setPen(QPen(QColor(51, 180, 233), 2));
-        items.back()->start->setCoords((300*i + 20)*timeStepMs, 3500);
-        items.back()->end->setCoords((300*i + 20)*timeStepMs, -3300);
+        m_items.push_back(new QCPItemLine(plot));
+        m_items.back()->setPen(QPen(QColor(51, 180, 233), 2));
+        m_items.back()->start->setCoords((319*i + l2)*timeStepMs, 3500);
+        m_items.back()->end->setCoords((319*i + l2)*timeStepMs, -3300);
 
-        items.push_back(new QCPItemLine(plot));
-        items.back()->setPen(QPen(QColor(51, 180, 233), 2));
-        items.back()->start->setCoords((300*i + 300)*timeStepMs, 3500);
-        items.back()->end->setCoords((300*i + 300)*timeStepMs, -3300);
+        m_items.push_back(new QCPItemLine(plot));
+        m_items.back()->setPen(QPen(QColor(51, 180, 233), 2));
+        m_items.back()->start->setCoords((319*i + 319 - l1)*timeStepMs, 3500);
+        m_items.back()->end->setCoords((319*i + 319 - l1)*timeStepMs, -3300);
 
-        /*textLabels.push_back(new QCPItemText(plot));
-        textLabels.back()->setPositionAlignment(Qt::AlignTop|Qt::AlignHCenter);
-        textLabels.back()->position->setCoords(150 * timeStepMs, 3490); // place position at center/top of axis rect
-        textLabels.back()->setText("Text Item Demo");
-        textLabels.back()->setFont(QFont(font().family(), 6, QFont::Weight::Bold)); // make font a bit larger
-        textLabels.back()->setColor(QColor(255, 255, 255));*/
+        m_textLabels.push_back(new QCPItemText(plot));
+        m_textLabels.back()->setPositionAlignment(Qt::AlignTop|Qt::AlignHCenter);
+        double label = stringToLabel(m_currentLabels.at(i));
+        m_textLabels.back()->position->setCoords(((2*319*i + 319 + l2 - l1) / 2)*timeStepMs, 3495); // place position at center/top of axis rect
+        m_textLabels.back()->setText(QString("%1: class %2").arg(i).arg(label));
+        m_textLabels.back()->setFont(QFont(font().family(), 8, QFont::Weight::Bold)); // make font a bit larger
+        m_textLabels.back()->setColor(QColor(255, 255, 255));
     }
     plot->replot();
+}
+
+double MainWindow::stringToLabel(std::string label)
+{
+    double result;
+
+    if (label == "jeden_rezystor_120")
+        result = 0;
+    else if (label == "rezystancja_60")
+        result = 1;
+    else if (label == "rezystor_10k")
+        result = 2;
+    else if (label == "zwarcie_lini_canL_do_masy_przez_110")
+        result = 3;
+    else if (label == "oba_zwarte_caly_czas_przez_rezystor_110")
+        result = 4;
+
+    return result;
 }
 
 QString MainWindow::labelToString(double label)
@@ -431,15 +450,15 @@ QString MainWindow::labelToString(double label)
     QString result;
 
     if (label == 0)
-        result = "jeden rezystor 120";
+        result = "jeden_rezystor_120";
     else if (label == 1)
-        result = "rezystancja 60";
+        result = "rezystancja_60";
     else if (label == 2)
-        result = "rezystor 10k";
+        result = "rezystor_10k";
     else if (label == 3)
-        result = "zwarcie CAN L do masy przez 110";
+        result = "zwarcie_lini_canL_do_masy_przez_110";
     else if (label == 4)
-        result = "oba zwarte przez rezystor 110";
+        result = "oba_zwarte_caly_czas_przez_rezystor_110";
 
     return result;
 }

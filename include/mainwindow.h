@@ -15,6 +15,8 @@
 
 
 class QCPRange;
+class QCPItemLine;
+class QCPItemText;
 
 namespace Ui {
 class MainWindow;
@@ -52,6 +54,7 @@ private:
     void populateTable();
     void plot(QVector<double> &x, QVector<double> &y);
     QString labelToString(double label);
+    double stringToLabel(std::string label);
 
     ELabel m_eLabel;
     EState m_state;
@@ -75,6 +78,9 @@ private:
     std::vector<std::string> m_featureNames;
     std::map<std::string, std::string> m_models;
     std::vector<size_t> m_signalNumbers;
+
+    std::vector<QCPItemLine*> m_items;
+    std::vector<QCPItemText*> m_textLabels;
 
     int m_row;
     int m_xAxisSize;
